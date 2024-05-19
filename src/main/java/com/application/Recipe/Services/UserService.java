@@ -3,6 +3,7 @@ package com.application.Recipe.Services;
 import java.util.List;
 import java.util.Optional;
 
+import com.application.Recipe.DTO.ChefDTO;
 import com.application.Recipe.Models.user;
 
 public interface UserService {
@@ -12,4 +13,5 @@ public interface UserService {
 	public Optional<user> getUserById(Integer user_id);
 	public List<user> getAllUsers();
 	Optional<user> getUserByEmail(String user_email);
+	public boolean upgradeToChef(ChefDTO chefDTO);
 }

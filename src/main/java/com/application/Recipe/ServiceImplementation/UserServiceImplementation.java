@@ -6,7 +6,11 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.application.Recipe.DTO.ChefDTO;
+import com.application.Recipe.Models.chef;
+import com.application.Recipe.Models.role;
 import com.application.Recipe.Models.user;
+import com.application.Recipe.Repository.ChefRepository;
 import com.application.Recipe.Repository.UserRepository;
 import com.application.Recipe.Services.UserService;
 
@@ -17,6 +21,9 @@ public class UserServiceImplementation implements UserService{
 	
 	@Autowired
 	UserRepository user_repository;
+	
+	@Autowired
+	ChefRepository chefRepository;
 	
 	/*public UserServiceImplementation(UserRepository user_repository) {
 		super();
@@ -67,7 +74,6 @@ public class UserServiceImplementation implements UserService{
 		Optional<user> user = user_repository.findByEmail(email);
 		if(user.isPresent()) {
 			user_repository.deleteByEmail(email);
-			System.out.print(user.isPresent());
 			return true;
 		}
 		else {
@@ -89,6 +95,30 @@ public class UserServiceImplementation implements UserService{
 	public List<user> getAllUsers() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public boolean upgradeToChef(ChefDTO chefDTO) {
+		Optional<user> userOptional = user_repository.findById(chefDTO.getUserId());
+		if(userOptional.isPresent()){
+			user user = userOptional.get();
+			chef chef = new chef();
+			chef.setId(user.getId()); // Inherited from User
+            chef.setFirstName(user.getFirstName());
+            chef.setLastName(user.getLastName());
+            chef.setEmail(user.getEmail());
+            chef.setPassword(user.getPassword());
+            chef.setRole(role.CHEF);
+            chef.setImage_url(user.getImage_url());
+            // Set additional Chef fields
+            chef.setLocation(chefDTO.getLocation());
+            chef.setPhone_number(chefDTO.getPhone_number());
+            chef.setBio(chefDTO.getBio());
+            chef.setYears_experience(chefDTO.getYears_of_experience());
+            chefRepository.save(chef);
+            return true;			
+		}
+		return false;
 	}
 	
 

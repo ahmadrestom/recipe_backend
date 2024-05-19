@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.application.Recipe.DTO.ChefDTO;
 import com.application.Recipe.DTO.UserDTO;
 import com.application.Recipe.Models.user;
 import com.application.Recipe.Repository.UserRepository;
@@ -90,6 +91,25 @@ public class userController {
 	    } else {
 	        return ResponseEntity.notFound().build();
 	    }
+	}
+	
+	@PutMapping
+	public ResponseEntity<String> upgradeToChef(@RequestBody ChefDTO chefDTO){
+		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		String currentUserEmail = userDetails.getUsername();
+		Optional<user> currentUserOptional = userService.getUserByEmail(currentUserEmail);
+		if(currentUserOptional.isPresent()) {
+			user currentUser = currentUserOptional.get();
+			chefDTO.setUserId(currentUser.getId());
+			boolean isUpgraded = userService.upgradeToChef(chefDTO);
+			if (isUpgraded) {
+                return ResponseEntity.ok("User upgraded to Chef successfully");
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+		}else {
+			return ResponseEntity.notFound().build();
+		}
 	}
 	
 	
