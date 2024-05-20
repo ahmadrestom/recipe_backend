@@ -13,7 +13,7 @@ public class ChefDTO {
 	private Integer userId;
 	private String location;
 	private String bio;
-	private Integer years_of_experience;
+	private Integer years_experience;
 	private String phone_number;
 
 }

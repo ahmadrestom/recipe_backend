@@ -58,24 +58,6 @@ public class userController {
 		}
 	}
 	
-	@PutMapping("/updateUser/{id}")
-	public ResponseEntity<String> updateUser(@PathVariable Integer id, @RequestBody user updatedUser){
-		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		String userEmail = userDetails.getUsername();
-		Optional<user> existingUser = userService.getUserById(id);
-		 if (existingUser.isPresent() && existingUser.get().getEmail().equals(userEmail)) {
-			 updatedUser.setId(id);
-			 boolean isUpdated = userService.updateUser(updatedUser);
-			 if (isUpdated) {
-		            return ResponseEntity.ok("User updated successfully");
-		        } else {
-		            return ResponseEntity.notFound().build();
-		        }
-		 }else {
-			 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-		 }
-	}
-	
 	@GetMapping("/getById/{id}")
 	public ResponseEntity<user> getUserById(@PathVariable Integer id){
 		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -93,7 +75,7 @@ public class userController {
 	    }
 	}
 	
-	@PutMapping
+	@PutMapping("/upgradeToChef")
 	public ResponseEntity<String> upgradeToChef(@RequestBody ChefDTO chefDTO){
 		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		String currentUserEmail = userDetails.getUsername();
@@ -112,18 +94,23 @@ public class userController {
 		}
 	}
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+	@PutMapping("/updateUser/{id}")
+	public ResponseEntity<String> updateUser(@PathVariable Integer id, @RequestBody user updatedUser){
+		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		String userEmail = userDetails.getUsername();
+		Optional<user> existingUser = userService.getUserById(id);
+		 if (existingUser.isPresent() && existingUser.get().getEmail().equals(userEmail)) {
+			 updatedUser.setId(id);
+			 boolean isUpdated = userService.updateUser(updatedUser);
+			 if (isUpdated) {
+		            return ResponseEntity.ok("User updated successfully");
+		        } else {
+		            return ResponseEntity.notFound().build();
+		        }
+		 }else {
+			 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+		 }
+	}
 	
 	
 }

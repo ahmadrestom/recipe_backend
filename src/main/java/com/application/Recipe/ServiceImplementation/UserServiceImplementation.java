@@ -98,28 +98,24 @@ public class UserServiceImplementation implements UserService{
 	}
 
 	@Override
-	public boolean upgradeToChef(ChefDTO chefDTO) {
-		Optional<user> userOptional = user_repository.findById(chefDTO.getUserId());
-		if(userOptional.isPresent()){
-			user user = userOptional.get();
-			chef chef = new chef();
-			chef.setId(user.getId()); // Inherited from User
-            chef.setFirstName(user.getFirstName());
-            chef.setLastName(user.getLastName());
-            chef.setEmail(user.getEmail());
-            chef.setPassword(user.getPassword());
-            chef.setRole(role.CHEF);
-            chef.setImage_url(user.getImage_url());
-            // Set additional Chef fields
-            chef.setLocation(chefDTO.getLocation());
-            chef.setPhone_number(chefDTO.getPhone_number());
-            chef.setBio(chefDTO.getBio());
-            chef.setYears_experience(chefDTO.getYears_of_experience());
-            chefRepository.save(chef);
-            return true;			
-		}
-		return false;
-	}
+    public boolean upgradeToChef(ChefDTO chefDTO) {
+        Optional<user> userOptional = user_repository.findById(chefDTO.getUserId());
+        if (userOptional.isPresent()) {
+            user existingUser = userOptional.get();
+            // Check if the user is not already a chef
+            if (!(existingUser instanceof chef)) {
+                // Update user role to "chef" and insert chef information
+            	existingUser.setRole(role.CHEF);
+            	user_repository.upgradeUserToChef(existingUser.getId(), chefDTO.getLocation(), chefDTO.getPhone_number(),
+                        chefDTO.getBio(), chefDTO.getYears_experience());
+                return true;
+            } else {
+                // User is already a chef, no need to upgrade
+                return false;
+            }
+        }
+        return false;
+    }
 	
 
 }
