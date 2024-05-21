@@ -1,6 +1,8 @@
 package com.application.Recipe.Controllers;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.application.Recipe.DTO.ChefDTO;
 import com.application.Recipe.DTO.UserDTO;
+import com.application.Recipe.Models.recentSearch;
 import com.application.Recipe.Models.user;
 import com.application.Recipe.Repository.UserRepository;
 import com.application.Recipe.Services.UserService;
@@ -47,6 +50,7 @@ public class userController {
 			return ResponseEntity.notFound().build();
 		}
 	}
+
 	
 	@DeleteMapping("/deleteUser/{email}")
 	public ResponseEntity<Void> deleteUserByEmail(@PathVariable String email){
@@ -110,6 +114,21 @@ public class userController {
 		 }else {
 			 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 		 }
+	}
+	
+	@GetMapping("/getRecentSearches")
+	public ResponseEntity<Set<recentSearch>> getUserRecentSearches(){
+		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		String userEmail = userDetails.getUsername();
+		Optional<user> userOptional = userService.getUserByEmail(userEmail);
+		if(userOptional.isPresent()) {
+			user user = userOptional.get();
+			Set<recentSearch> recentSearches = user.getRecentSearches();
+			
+			return ResponseEntity.ok(recentSearches);
+		}else {
+			return ResponseEntity.notFound().build();
+		}
 	}
 	
 	

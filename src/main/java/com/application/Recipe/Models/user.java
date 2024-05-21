@@ -2,21 +2,27 @@ package com.application.Recipe.Models;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.Basic;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import jakarta.validation.constraints.Email;
@@ -39,8 +45,8 @@ public class user implements UserDetails{
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@Basic(optional = false)
-	@Column(name= "user_id")
+	//@Basic(optional = false)
+	@Column(name= "user_id", nullable=false)
 	@GeneratedValue(strategy = GenerationType.IDENTITY)	
 	private Integer id;
 	
@@ -75,6 +81,10 @@ public class user implements UserDetails{
 	
 	@Enumerated(EnumType.STRING)
 	private role role;
+	
+	@OneToMany(mappedBy = "user", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference
+	private Set<recentSearch> recentSearches;
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -104,5 +114,20 @@ public class user implements UserDetails{
 	@Override
 	public boolean isEnabled() {
 		return true;
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+
+		user user = (user) o;
+
+		return id != null ? id.equals(user.id) : user.id == null;
+	}
+
+	@Override
+	public int hashCode() {
+		return id != null ? id.hashCode() : 0;
 	}
 }

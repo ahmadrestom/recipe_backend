@@ -15,7 +15,7 @@ import com.application.Recipe.Repository.UserRepository;
 import com.application.Recipe.Services.UserService;
 
 import jakarta.transaction.Transactional;
-
+import com.application.Recipe.Repository.recentSearchRepository;
 @Service
 public class UserServiceImplementation implements UserService{
 	
@@ -24,6 +24,9 @@ public class UserServiceImplementation implements UserService{
 	
 	@Autowired
 	ChefRepository chefRepository;
+	
+	@Autowired
+	recentSearchRepository recentSearchRepository;
 	
 	/*public UserServiceImplementation(UserRepository user_repository) {
 		super();
@@ -93,12 +96,12 @@ public class UserServiceImplementation implements UserService{
 
 	@Override
 	public List<user> getAllUsers() {
-		// TODO Auto-generated method stub
-		return null;
+		List<user> AllUsers= user_repository.findAll();
+		return AllUsers;
 	}
 
 	@Override
-    public boolean upgradeToChef(ChefDTO chefDTO) {
+    public boolean upgradeToChef(ChefDTO chefDTO){
         Optional<user> userOptional = user_repository.findById(chefDTO.getUserId());
         if (userOptional.isPresent()) {
             user existingUser = userOptional.get();
