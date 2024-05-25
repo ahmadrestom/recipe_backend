@@ -7,8 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.application.Recipe.DTO.ChefDTO;
+import com.application.Recipe.Enums.role;
 import com.application.Recipe.Models.chef;
-import com.application.Recipe.Models.role;
 import com.application.Recipe.Models.user;
 import com.application.Recipe.Repository.ChefRepository;
 import com.application.Recipe.Repository.UserRepository;

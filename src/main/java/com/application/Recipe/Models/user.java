@@ -8,6 +8,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.application.Recipe.Enums.role;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.Basic;
@@ -50,35 +51,30 @@ public class user implements UserDetails{
 	@GeneratedValue(strategy = GenerationType.IDENTITY)	
 	private Integer id;
 	
-	@Basic(optional = false)
-	@Column(name = "first_name")
+	@Column(name = "first_name",nullable=false)
 	private String firstName;
 	
-	@Basic(optional = false)
-	@Column(name = "last_name")
+	@Column(name = "last_name",nullable=false)
 	private String lastName;
 	
-	@Basic(optional = false)
 	@Email(message="Invalid email format")
 	@NotBlank(message="Email cannot be empty")
-	@Column(name = "email")
+	@Column(name = "email",nullable=false)
 	private String email;
 	
-	
-	@Basic(optional = false)
 	@Size(min=8, max = 30, message="Password must be between 8 and 20 characters")
 	@NotBlank(message="Password is required")
-	@Column(name = "password")
+	@Column(name = "password", nullable=false)
 	private String password;
 	
 	/*@Basic(optional = false)
 	@Transient
 	private String confirm_password;*/
 	
-	@Basic(optional = true)
-	@Column(name = "image_url")
+	@Column(name = "image_url",nullable=true)
 	private String image_url;
 	
+	@Column(name = "role", nullable =false)
 	@Enumerated(EnumType.STRING)
 	private role role;
 	

@@ -24,12 +24,10 @@ public class SecutiryConfig {
         http
                 .csrf(csrf -> csrf
                         .disable())
-                .authorizeHttpRequests()
-                .requestMatchers("/api/v1/auth/**")
-                .permitAll()
-                .anyRequest()
-                .authenticated()
-                .and()
+                .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/api/v1/**").permitAll()
+                        .requestMatchers("/api/v2/**").authenticated()
+                        .anyRequest().permitAll())
                 .sessionManagement(management -> management
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider)
@@ -38,7 +36,4 @@ public class SecutiryConfig {
 		return http.build();
 	
 	}
-	
-	
-
 }

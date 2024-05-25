@@ -48,7 +48,7 @@ public class recentSearchController {
 		String userEmail = userDetails.getUsername();
 		boolean isAdded = recentSearchService.addRecentSearch(userEmail, searchTermRequest.search_term);
 		if(isAdded) {
-			return ResponseEntity.ok("Recent search added successfully");
+			return ResponseEntity.status(HttpStatus.CREATED).body("Recent search added successfully");
 		}else {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error adding recent search");
 		}

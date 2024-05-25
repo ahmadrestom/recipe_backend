@@ -25,7 +25,7 @@ import com.application.Recipe.Repository.UserRepository;
 import com.application.Recipe.Services.UserService;
 
 @RestController
-@RequestMapping("/api/v1/user")
+@RequestMapping("/api/v2/user")
 public class userController {
 	
 	@Autowired

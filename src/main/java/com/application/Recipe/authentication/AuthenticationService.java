@@ -7,7 +7,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.application.Recipe.Config.JwtService;
-import com.application.Recipe.Models.role;
+import com.application.Recipe.Enums.role;
 import com.application.Recipe.Models.user;
 import com.application.Recipe.Repository.UserRepository;
 
