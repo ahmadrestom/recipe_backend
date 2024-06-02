@@ -9,9 +9,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.application.Recipe.Enums.role;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-
-import jakarta.persistence.Basic;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -21,11 +20,13 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -81,6 +82,21 @@ public class user implements UserDetails{
 	@OneToMany(mappedBy = "user", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference
 	private Set<recentSearch> recentSearches;
+	
+	@ManyToMany
+	@JoinTable(
+			name = "favorites",
+			joinColumns = @JoinColumn(name = "user_id"),
+			inverseJoinColumns = @JoinColumn(name = "recipe_id")			
+			)
+	@JsonIgnore
+	private Set<Recipe> favorites;
+	
+	@ManyToMany(mappedBy="followers")
+	private Set<chef> followingChefs;
+	
+	@OneToMany(mappedBy="user", fetch=FetchType.LAZY)
+	private Set<Review> reviews;
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {

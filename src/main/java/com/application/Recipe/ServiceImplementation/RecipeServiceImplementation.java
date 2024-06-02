@@ -2,25 +2,39 @@ package com.application.Recipe.ServiceImplementation;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.application.Recipe.CompositeKeys.IngredientId;
+import com.application.Recipe.CompositeKeys.InstructionId;
 import com.application.Recipe.DTO.GETRecipeDTO;
+import com.application.Recipe.DTO.IngredientDTO;
+import com.application.Recipe.DTO.InstructionDTO;
+import com.application.Recipe.DTO.NutritionInformationDTOForRecipe;
 import com.application.Recipe.DTO.POSTRecipeDTO;
+import com.application.Recipe.DTO.GetReviewDTO;
 import com.application.Recipe.DTO.categoryDTO_forRecipeGET;
 import com.application.Recipe.DTO.chefDTO_forRecipeGET;
 import com.application.Recipe.Models.category;
 import com.application.Recipe.Models.chef;
+import com.application.Recipe.Models.ingredient;
+import com.application.Recipe.Models.Instruction;
+import com.application.Recipe.Models.NutritionInformation;
 import com.application.Recipe.Models.Recipe;
+import com.application.Recipe.Models.Review;
 import com.application.Recipe.Repository.CategoryRepository;
 import com.application.Recipe.Repository.ChefRepository;
+import com.application.Recipe.Repository.IngredientsRepository;
+import com.application.Recipe.Repository.InstructionsRepository;
+import com.application.Recipe.Repository.NutritionInformationRepository;
 import com.application.Recipe.Repository.RecipeRepository;
 import com.application.Recipe.Services.RecipeService;
-
 import jakarta.transaction.Transactional;
 
 @Service
@@ -34,7 +48,16 @@ public class RecipeServiceImplementation implements RecipeService{
 	
 	@Autowired
 	ChefRepository chefRepository;
+	
+	@Autowired
+	NutritionInformationRepository nutritionInformationRepository;
 
+	@Autowired
+	IngredientsRepository ingredientsRepository;
+	
+	@Autowired
+	InstructionsRepository instructionRepository;
+	
 	@Override
 	public Optional<Recipe> getRecipeById(Integer recipeId) {
 		return recipeRepository.findById(recipeId);
@@ -67,7 +90,7 @@ public class RecipeServiceImplementation implements RecipeService{
     }
 	
 	@Override
-	public GETRecipeDTO convertToGETRecipeDTO(Recipe recipe) {
+	public GETRecipeDTO convertToGETRecipeDTO(Recipe recipe){
 		
 		categoryDTO_forRecipeGET categoryDTO = new categoryDTO_forRecipeGET
 			(
@@ -75,6 +98,36 @@ public class RecipeServiceImplementation implements RecipeService{
 				 recipe.getCategory().getCategory_name()
 			);
 		
+		Set<IngredientDTO> ingredients = new HashSet<>();
+		for(ingredient i: recipe.getIngredients()) {
+			
+			IngredientDTO dto = IngredientDTO.builder()
+					.ingredientName(i.getId().getIngredient())
+					.grams(i.getGrams())
+					.build();
+			
+			ingredients.add(dto);
+		}
+		
+		List<InstructionDTO> instructions = new ArrayList<>();
+		for(Instruction i: recipe.getInstructions()) {
+			InstructionDTO dto = InstructionDTO.builder()
+					.instruction(i.getInstruction())
+					.order(i.getId().getInstructionOrder())
+					.build();
+			instructions.add(dto);
+		}
+		
+		Set<Review> reviews = new HashSet<>();
+		for(Review r: recipe.getReviews()) {
+			GetReviewDTO dto = GetReviewDTO.builder()
+					.text(r.getText())
+					.likes(r.getLikes())
+					.dislikes(r.getDislikes())
+					.timeUploaded(r.getTimeUploaded())
+					.build();
+			reviews.add(r);
+		}
 		
 		chefDTO_forRecipeGET chefDTO = new chefDTO_forRecipeGET
 				(
@@ -87,6 +140,20 @@ public class RecipeServiceImplementation implements RecipeService{
 						recipe.getChef().getBio(), 
 						recipe.getChef().getYears_experience()
 				);
+		
+		NutritionInformationDTOForRecipe niDTO = NutritionInformationDTOForRecipe.builder()
+				.calories(recipe.getNutritionInformation().getCalories())
+				.total_fat(recipe.getNutritionInformation().getTotal_fat())
+				.cholesterol(recipe.getNutritionInformation().getCholesterol())
+				.carbohydrates(recipe.getNutritionInformation().getCarbohydrates())
+				.protein(recipe.getNutritionInformation().getProtein())
+				.sugar(recipe.getNutritionInformation().getSugar())
+				.sodium(recipe.getNutritionInformation().getSodium())
+				.fiber(recipe.getNutritionInformation().getFiber())
+				.zinc(recipe.getNutritionInformation().getZinc())
+				.magnesium(recipe.getNutritionInformation().getMagnesium())
+				.potassium(recipe.getNutritionInformation().getPotassium())
+				.build();
 		
 		GETRecipeDTO RecipeGetDTO = GETRecipeDTO.builder()
 				.recipeId(recipe.getRecipeId())
@@ -101,13 +168,64 @@ public class RecipeServiceImplementation implements RecipeService{
 				.plateImageUrl(recipe.getPlateImageUrl())
 				.category(categoryDTO)
 				.chef(chefDTO)
+				.ni(niDTO)
+				.instructions(instructions)
+				.ingredients(ingredients)
+				.reviews(reviews)
 				.build();
 		
 		return RecipeGetDTO;
 	}
 	
 	@Override
-	public Recipe addRecipe(POSTRecipeDTO pOSTRecipeDTO) {
+	public List<InstructionDTO> getRecipeInstructions(String recipeName){
+		Recipe r = recipeRepository.findByRecipeName(recipeName)
+				.orElseThrow(()->new RuntimeException("Recipe not available"));
+		
+		List<InstructionDTO> DTOs = new ArrayList<>();
+		List<Instruction> instructions = r.getInstructions();
+		if(instructions.isEmpty())
+			throw new RuntimeException("No instructions found");
+		for(Instruction i: instructions) {
+			InstructionDTO dto = InstructionDTO.builder()
+					.instruction(i.getInstruction())
+					.order(i.getId().getInstructionOrder())
+					.build();
+			DTOs.add(dto);
+		}
+		return DTOs;
+		
+		
+	}
+	
+	@Override
+	public	Set<IngredientDTO> GetRecipeIngredients(String recipeName){
+		
+		Recipe r = recipeRepository.findByRecipeName(recipeName)
+				.orElseThrow(()->new RuntimeException("Recipe not available"));
+		
+		
+		try {
+			Set<IngredientDTO> DTOs = new HashSet<>();
+			Set<ingredient> ingredients = r.getIngredients();
+			if(ingredients.isEmpty())
+				throw new RuntimeException("No ingredients availabel");
+			for(ingredient i: ingredients){
+				IngredientDTO dto = IngredientDTO.builder()
+						.ingredientName(i.getId().getIngredient())
+						.grams(i.getGrams())
+						.build();
+				DTOs.add(dto);
+			}
+			return DTOs;
+		}catch(RuntimeException e) {
+			throw new RuntimeException(e.getMessage());
+		}
+	}
+	
+	@Transactional
+	@Override
+	public Recipe addRecipe(POSTRecipeDTO pOSTRecipeDTO){
 		if(recipeRepository.findByRecipeName(pOSTRecipeDTO.getRecipeName()).isPresent())
 		{
 			throw new RuntimeException("Recipe already exists");
@@ -119,10 +237,10 @@ public class RecipeServiceImplementation implements RecipeService{
 		chef chef = chefRepository.findById(pOSTRecipeDTO.getChefId())
 				.orElseThrow(()->new RuntimeException("Chef Not Found"));
 		
-		Recipe r = Recipe.builder()
+		Recipe recipe = Recipe.builder()
 				.recipeName(pOSTRecipeDTO.getRecipeName())
 				.description(pOSTRecipeDTO.getDescription())
-				.timeUploaded(pOSTRecipeDTO.getTimeUploaded())
+				//.timeUploaded(pOSTRecipeDTO.getTimeUploaded())
 				.preparationTime(pOSTRecipeDTO.getPreparationTime())
 				.cookingTime(pOSTRecipeDTO.getCookingTime())
 				.difficultyLevel(pOSTRecipeDTO.getDifficultyLevel())
@@ -133,7 +251,64 @@ public class RecipeServiceImplementation implements RecipeService{
 				.chef(chef)
 				.build();
 		
-		return recipeRepository.save(r);
+		Recipe savedRecipe = recipeRepository.save(recipe);
+		
+		
+		NutritionInformation ni = NutritionInformation.builder()
+				.recipe(savedRecipe)
+				.calories(pOSTRecipeDTO.getNi().getCalories())
+				.total_fat(pOSTRecipeDTO.getNi().getTotal_fat())
+				.cholesterol(pOSTRecipeDTO.getNi().getCholesterol())
+				.carbohydrates(pOSTRecipeDTO.getNi().getCarbohydrates())
+				.protein(pOSTRecipeDTO.getNi().getProtein())
+				.sugar(pOSTRecipeDTO.getNi().getSugar())
+				.sodium(pOSTRecipeDTO.getNi().getSodium())
+				.fiber(pOSTRecipeDTO.getNi().getFiber())
+				.zinc(pOSTRecipeDTO.getNi().getZinc())
+				.magnesium(pOSTRecipeDTO.getNi().getMagnesium())
+				.potassium(pOSTRecipeDTO.getNi().getPotassium())
+				.build();
+		
+		nutritionInformationRepository.save(ni);
+		
+		Set<ingredient> ingredients = new HashSet<>();
+		
+		for(IngredientDTO iDTO: pOSTRecipeDTO.getIngredients()){
+			IngredientId id = IngredientId.builder()
+					.recipeId(recipe.getRecipeId())
+					.ingredient(iDTO.getIngredientName())
+					.build();
+			
+			ingredient i = ingredient.builder()
+					.id(id)
+					.grams(iDTO.getGrams())
+					.recipe(savedRecipe)
+					.build();
+			ingredients.add(i);
+		}
+		ingredientsRepository.saveAll(ingredients);
+		
+		List<Instruction> instructions = new ArrayList<>();
+		for(InstructionDTO iDTO: pOSTRecipeDTO.getInstructions()) {
+			InstructionId id = InstructionId.builder()
+					.recipeId(recipe.getRecipeId())
+					.instructionOrder(iDTO.getOrder())
+					.build();
+			
+			Instruction i = Instruction.builder()
+					.id(id)
+					.instruction(iDTO.getInstruction())
+					.recipe(savedRecipe)
+					.build();
+			
+			instructions.add(i);
+		}
+		instructionRepository.saveAll(instructions);
+		savedRecipe.setIngredients(ingredients);
+		savedRecipe.setNutritionInformation(ni);
+		savedRecipe.setInstructions(instructions);
+		
+		return recipeRepository.save(savedRecipe);
 	}
 
 	@Override
@@ -145,8 +320,8 @@ public class RecipeServiceImplementation implements RecipeService{
 		return false;
 	}
 
-	@Override
 	@Transactional
+	@Override
 	public boolean deleteRecipeByName(String recipeName) {
 		Optional<Recipe> recipe = recipeRepository.findByRecipeName(recipeName);
 		if(recipe.isPresent()) {

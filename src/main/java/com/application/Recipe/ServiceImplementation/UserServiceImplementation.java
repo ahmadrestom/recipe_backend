@@ -1,19 +1,24 @@
 package com.application.Recipe.ServiceImplementation;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-
+import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-
 import com.application.Recipe.DTO.ChefDTO;
+import com.application.Recipe.DTO.UserFavoritesDTO;
 import com.application.Recipe.Enums.role;
+import com.application.Recipe.Models.Recipe;
 import com.application.Recipe.Models.chef;
 import com.application.Recipe.Models.user;
 import com.application.Recipe.Repository.ChefRepository;
+import com.application.Recipe.Repository.RecipeRepository;
 import com.application.Recipe.Repository.UserRepository;
 import com.application.Recipe.Services.UserService;
-
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import com.application.Recipe.Repository.recentSearchRepository;
 @Service
@@ -28,10 +33,8 @@ public class UserServiceImplementation implements UserService{
 	@Autowired
 	recentSearchRepository recentSearchRepository;
 	
-	/*public UserServiceImplementation(UserRepository user_repository) {
-		super();
-		this.user_repository = user_repository;
-	}*/
+	@Autowired
+	RecipeRepository recipeRepository;
 
 	@Override
 	public String createUser(user user){
@@ -119,6 +122,111 @@ public class UserServiceImplementation implements UserService{
         }
         return false;
     }
+
+	@Transactional
+	@Override
+	public void followChef(Integer chefId) {
+		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		String currentUserEmail = userDetails.getUsername();
+		Optional<user> userOptional = user_repository.findByEmail(currentUserEmail);
+		if(userOptional.isEmpty())
+			throw new EntityNotFoundException("User not found");
+		
+		user user = userOptional.get();
+		if(user instanceof chef){
+			throw new IllegalStateException("A chef cannot follow anther chef.");
+		}
+		chef chef = chefRepository.findById(chefId)
+				.orElseThrow(()->new RuntimeException("Chef not found."));
+		
+		user.getFollowingChefs().add(chef);
+		
+		chef.getFollowers().add(user);
+		chefRepository.save(chef);
+		user_repository.save(user);
+		
+	}
+	
+	@Transactional
+	@Override
+	public void unfollowChef(Integer chefId){
+		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		String currentUserEmail = userDetails.getUsername();
+		Optional<user> userOptional = user_repository.findByEmail(currentUserEmail);
+		if(userOptional.isEmpty())
+			throw new EntityNotFoundException("User not found");
+		chef chef = chefRepository.findById(chefId)
+				.orElseThrow(()->new RuntimeException("Chef not found."));
+		user user = userOptional.get();
+		user.getFollowingChefs().remove(chef);
+		chef.getFollowers().remove(user);
+		chefRepository.save(chef);
+		user_repository.save(user);
+		
+	}
+	
+	@Override
+	public boolean addFavoriteRecipe(Integer recipeId) {
+		try {
+			UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			String currentUserEmail = userDetails.getUsername();
+			Optional<user> userOptional = user_repository.findByEmail(currentUserEmail);
+			Optional<Recipe> recipeOptional = recipeRepository.findById(recipeId);
+			if(userOptional.isPresent() && recipeOptional.isPresent())
+			{
+				if(userOptional.get().getFavorites().contains(recipeOptional.get().getRecipeId()))
+					throw new RuntimeException("Recipe is already in favorites");
+				userOptional.get().getFavorites().add(recipeOptional.get());
+				user_repository.save(userOptional.get());
+				return true;
+			}
+			else if(userOptional.isEmpty())
+			{
+				throw new EntityNotFoundException("User not found");			
+			}
+			else
+			{
+				throw new EntityNotFoundException("Recipe not found");
+			}
+		}catch(Exception e) {
+			return false;
+		}
+	}
+
+	@Override
+	public Set<UserFavoritesDTO> getFavoriteRecipes() {
+		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		String currentUserEmail = userDetails.getUsername();
+		Optional<user> userOptional = user_repository.findByEmail(currentUserEmail);
+		if(userOptional.isEmpty())
+			throw new EntityNotFoundException("User not found");
+		
+		user user = userOptional.get();
+		Set<Recipe> recipes = user.getFavorites();
+		
+		if(recipes.isEmpty())
+			throw new RuntimeException("You have no favorite recipes. Add some now!");
+		
+		Set<UserFavoritesDTO> recipeDTOs = new HashSet<>();
+		
+		for(Recipe recipe:recipes) {
+			UserFavoritesDTO dto = UserFavoritesDTO.builder()
+					.recipeName(recipe.getRecipeName())
+					.description(recipe.getDescription())
+					.timeUploaded(recipe.getTimeUploaded())
+					.preparationTime(recipe.getPreparationTime())
+					.cookingTime(recipe.getCookingTime())
+					.difficultyLevel(recipe.getDifficultyLevel())
+					.rating(recipe.getRating())
+					.imageUrl(recipe.getImageUrl())
+					.categoryName(recipe.getCategory().getCategory_name())
+					.chefName(recipe.getChef().getFirstName()+" "+recipe.getChef().getLastName())
+					.chefPictureUrl(recipe.getChef().getImage_url())
+					.build();
+			recipeDTOs.add(dto);
+		}
+		return recipeDTOs;
+	}
 	
 
 }

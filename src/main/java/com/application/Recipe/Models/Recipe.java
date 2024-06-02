@@ -2,13 +2,12 @@ package com.application.Recipe.Models;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Set;
 
 import com.application.Recipe.Enums.DifficultyLevel;
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -18,17 +17,22 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name="recipe")
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -82,6 +86,21 @@ public class Recipe implements Serializable{
 	@JoinColumn(name = "chef_id",  nullable=false)
 	@JsonManagedReference
 	private chef chef;
+	
+	@OneToOne(mappedBy = "recipe", fetch = FetchType.LAZY)
+    private NutritionInformation nutritionInformation;
+	
+	@ManyToMany(mappedBy = "favorites")
+	private Set<user> favoritesByUsers;
+	
+	@OneToMany(mappedBy="recipe",  fetch=FetchType.LAZY)
+	private Set<ingredient> ingredients;
+	
+	@OneToMany(mappedBy="recipe", fetch=FetchType.LAZY)
+	private List<Instruction> instructions;
+	
+	@OneToMany(mappedBy="recipe", fetch=FetchType.LAZY)
+	private Set<Review> reviews;
 	
 	@PrePersist
     protected void onCreate() {

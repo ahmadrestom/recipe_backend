@@ -3,7 +3,7 @@ package com.application.Recipe.Controllers;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-
+import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,14 +15,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.application.Recipe.DTO.GETRecipeDTO;
+import com.application.Recipe.DTO.IngredientDTO;
+import com.application.Recipe.DTO.InstructionDTO;
 import com.application.Recipe.DTO.POSTRecipeDTO;
-import com.application.Recipe.DTO.categoryDTO_forRecipeGET;
-import com.application.Recipe.DTO.chefDTO_forRecipeGET;
 import com.application.Recipe.Models.Recipe;
 import com.application.Recipe.Services.RecipeService;
-
 import jakarta.validation.Valid;
 
 @RestController
@@ -94,6 +92,26 @@ public class recipeController {
             return ResponseEntity.ok(recipeDTOs);
         }
 	}
+	
+	@GetMapping("/getRecipeIngredients/{recipeName}")
+	public ResponseEntity<?> getRecipeIngredients(@PathVariable String recipeName){
+		try {
+			Set<IngredientDTO> ingredients = recipeService.GetRecipeIngredients(recipeName);
+			return ResponseEntity.ok(ingredients);		
+		}catch(Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+		}
+	}
+	
+	@GetMapping("/getRecipeInstructions/{recipeName}")
+	public ResponseEntity<?> getRecipeInstructions(@PathVariable String recipeName){
+		try {
+			List<InstructionDTO> instructions = recipeService.getRecipeInstructions(recipeName);
+			return ResponseEntity.ok(instructions);
+		}catch(Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+		}
+	}
 
 	@GetMapping("/getAllRecipes")
 	public ResponseEntity<?> getAllRecipes()
@@ -114,6 +132,8 @@ public class recipeController {
 		GETRecipeDTO RecipeToBeReturned = recipeService.convertToGETRecipeDTO(createdRecipe); 
 		return ResponseEntity.status(HttpStatus.CREATED).body(RecipeToBeReturned);
 	}
+	
+	
 	
 	
 }

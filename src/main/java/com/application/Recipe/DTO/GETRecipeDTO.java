@@ -5,8 +5,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Set;
 
 import com.application.Recipe.Enums.DifficultyLevel;
+import com.application.Recipe.Models.Review;
 
 @Data
 @AllArgsConstructor
@@ -26,4 +29,14 @@ public class GETRecipeDTO {
 	private String plateImageUrl;
 	private categoryDTO_forRecipeGET category;
 	private chefDTO_forRecipeGET chef;
+	
+	NutritionInformationDTOForRecipe ni;
+	
+	Set<IngredientDTO> ingredients;
+	 
+	List<InstructionDTO> instructions;
+	
+	Set<Review> reviews;
+	
+	
 }
