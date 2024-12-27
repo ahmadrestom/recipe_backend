@@ -171,6 +171,17 @@ public class userController {
 		}
 	}
 	
+	@DeleteMapping("/removeFavoriteRecipe/{recipeId}")
+	public ResponseEntity<?> removeFavoriteRecipe(@PathVariable UUID recipeId)
+	{
+		try {
+			userService.removeFavoriteRecipe(recipeId);
+			return ResponseEntity.ok("Recipe removed from favorites");
+		}catch(Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e);	
+		}
+	}
+	
 	@GetMapping("/getUserFavorites")
 	public ResponseEntity<?> getUserFavorites()
 	{

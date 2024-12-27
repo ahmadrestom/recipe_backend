@@ -194,6 +194,34 @@ public class UserServiceImplementation implements UserService{
 			return false;
 		}
 	}
+	
+	@Override
+	public boolean removeFavoriteRecipe(UUID recipeId) {
+	    try {
+	        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+	        String currentUserEmail = userDetails.getUsername();
+	        Optional<user> userOptional = user_repository.findByEmail(currentUserEmail);
+	        Optional<Recipe> recipeOptional = recipeRepository.findById(recipeId);
+	        if (userOptional.isPresent() && recipeOptional.isPresent()) {
+	            user currentUser = userOptional.get();
+	            Recipe recipeToRemove = recipeOptional.get();
+	            if (currentUser.getFavorites().contains(recipeToRemove)) {
+	                currentUser.getFavorites().remove(recipeToRemove);
+	                user_repository.save(currentUser); 
+	                return true;
+	            } else {
+	                throw new RuntimeException("Recipe not found in favorites");
+	            }
+	        } else if (userOptional.isEmpty()) {
+	            throw new EntityNotFoundException("User not found");
+	        } else {
+	            throw new EntityNotFoundException("Recipe not found");
+	        }
+	    } catch (Exception e) {
+	        return false;
+	    }
+	}
+
 
 	@Override
 	public Set<UserFavoritesDTO> getFavoriteRecipes() {
@@ -230,6 +258,4 @@ public class UserServiceImplementation implements UserService{
 		}
 		return recipeDTOs;
 	}
-	
-
 }

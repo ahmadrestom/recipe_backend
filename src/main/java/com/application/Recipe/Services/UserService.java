@@ -20,6 +20,7 @@ public interface UserService {
 	Optional<user> getUserByEmail(String user_email);
 	public boolean upgradeToChef(ChefDTO chefDTO);
 	public boolean addFavoriteRecipe(UUID recipeId);
+	public boolean removeFavoriteRecipe(UUID recipeId);
 	public Set<UserFavoritesDTO> getFavoriteRecipes();
 	
 	@Transactional

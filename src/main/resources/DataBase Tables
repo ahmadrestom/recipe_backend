@@ -1,0 +1,220 @@
+CREATE TABLE `recipe_application`.`category` (
+  `category_id` BINARY(16) NOT NULL,
+  `category_name` VARCHAR(90) NOT NULL,
+  PRIMARY KEY (`category_id`),
+  UNIQUE INDEX `category_id_UNIQUE` (`category_id` ASC) VISIBLE,
+  UNIQUE INDEX `category_name_UNIQUE` (`category_name` ASC) VISIBLE
+  );
+
+  CREATE TABLE `recipe_application`.`user` (
+  `user_id` BINARY(16) NOT NULL,
+  `first_name` VARCHAR(90) NOT NULL,
+  `last_name` VARCHAR(90) NOT NULL,
+  `email` VARCHAR(120) NOT NULL,
+  `password` VARCHAR(255) NOT NULL,
+  `image_url` VARCHAR(255) NULL,
+  `role` ENUM('USER', 'ADMIN', 'CHEF') NOT NULL,
+  PRIMARY KEY (`user_id`),
+  UNIQUE INDEX `user_id_UNIQUE` (`user_id` ASC) VISIBLE,
+  UNIQUE INDEX `email_UNIQUE` (`email` ASC) VISIBLE,
+  UNIQUE INDEX `password_UNIQUE` (`password` ASC) VISIBLE,
+  UNIQUE INDEX `image_url_UNIQUE` (`image_url` ASC) VISIBLE
+  );
+  
+  CREATE TABLE `recipe_application`.`chef` (
+  `location` VARCHAR(100) NOT NULL,
+  `phone_number` VARCHAR(45) NOT NULL,
+  `bio` TEXT NOT NULL,
+  `years_experience` INT UNSIGNED NOT NULL,
+  `user_id` BINARY(16) NOT NULL,
+  UNIQUE INDEX `phone_number_UNIQUE` (`phone_number` ASC) VISIBLE,
+  PRIMARY KEY (`user_id`),
+  UNIQUE INDEX `user_id_UNIQUE` (`user_id` ASC) VISIBLE,
+  CONSTRAINT `fk_user_id_chef`
+    FOREIGN KEY (`user_id`)
+    REFERENCES `recipe_application`.`user` (`user_id`)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE);
+    
+  CREATE TABLE `recipe_application`.`recipe` (
+  `recipe_id` BINARY(16) NOT NULL,
+  `recipe_name` VARCHAR(180) NOT NULL,
+  `description` TEXT NOT NULL,
+  `time_uploaded` DATETIME NULL DEFAULT NULL,
+  `preparation_time` INT UNSIGNED NOT NULL,
+  `cooking_time` INT UNSIGNED NOT NULL,
+  `difficulty` ENUM('Easy', 'Medium', 'Hard') NOT NULL,
+  `rating` DECIMAL(2,1) UNSIGNED NOT NULL,
+  `image_url` VARCHAR(255) NOT NULL,
+  `plate_image_url` VARCHAR(255) NOT NULL,
+  `category_id` BINARY(16) NOT NULL,
+  `chef_id` BINARY(16) NOT NULL,
+  PRIMARY KEY (`recipe_id`),
+  UNIQUE INDEX `recipe_id_UNIQUE` (`recipe_id` ASC) VISIBLE,
+  UNIQUE INDEX `image_url_UNIQUE` (`image_url` ASC) VISIBLE,
+  UNIQUE INDEX `plate_image_url_UNIQUE` (`plate_image_url` ASC) VISIBLE,
+  INDEX `fk_category_id_recipe_idx` (`category_id` ASC) VISIBLE,
+  INDEX `fk_chef_id_recipe_idx` (`chef_id` ASC) VISIBLE,
+  CONSTRAINT `fk_category_id_recipe`
+    FOREIGN KEY (`category_id`)
+    REFERENCES `recipe_application`.`category` (`category_id`)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_chef_id_recipe`
+    FOREIGN KEY (`chef_id`)
+    REFERENCES `recipe_application`.`chef` (`user_id`)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE
+    );
+    
+    CREATE TABLE `recipe_application`.`reviews` (
+  `text` TEXT NOT NULL,
+  `likes` INT UNSIGNED NOT NULL,
+  `dislikes` INT UNSIGNED NOT NULL,
+  `time_uploaded` DATETIME NOT NULL,
+  `recipe_id` BINARY(16) NOT NULL,
+  `user_id` BINARY(16) NOT NULL,
+  PRIMARY KEY (`recipe_id`, `user_id`),
+  INDEX `fk_user_id_review_idx` (`user_id` ASC) VISIBLE,
+  CONSTRAINT `fk_recipe_id_review`
+    FOREIGN KEY (`recipe_id`)
+    REFERENCES `recipe_application`.`recipe` (`recipe_id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_user_id_review`
+    FOREIGN KEY (`user_id`)
+    REFERENCES `recipe_application`.`user` (`user_id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE);
+    
+    
+    CREATE TABLE `recipe_application`.`recent_search` (
+  `search_term` VARCHAR(255) NOT NULL,
+  `user_id` BINARY(16) NOT NULL,
+  PRIMARY KEY (`search_term`, `user_id`),
+  INDEX `fk_user_id_recent_search_idx` (`user_id` ASC) VISIBLE,
+  CONSTRAINT `fk_user_id_recent_search`
+    FOREIGN KEY (`user_id`)
+    REFERENCES `recipe_application`.`user` (`user_id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE);
+    
+    
+    CREATE TABLE nutrition_information (
+    calories DECIMAL(10,2) NOT NULL,
+    total_fat DECIMAL(10,2) NOT NULL,
+    cholesterol DECIMAL(10,2) NOT NULL,
+    carbohydrates DECIMAL(10,2) NOT NULL,
+    protein DECIMAL(10,2) NOT NULL,
+    sugar DECIMAL(10,2) NOT NULL,
+    sodium DECIMAL(10,2) NOT NULL,
+    fiber DECIMAL(10,2) NOT NULL,
+    zinc DECIMAL(10,2) NOT NULL,
+    magnesium DECIMAL(10,2) NOT NULL,
+    potassium DECIMAL(10,2) NOT NULL,
+    recipe_id BINARY(16) NOT NULL,
+    
+    FOREIGN KEY (recipe_id) REFERENCES recipe(recipe_id),
+    
+    CHECK (calories >= 0),
+    CHECK (total_fat >= 0),
+    CHECK (cholesterol >= 0),
+    CHECK (carbohydrates >= 0),
+    CHECK (protein >= 0),
+    CHECK (sugar >= 0),
+    CHECK (sodium >= 0),
+    CHECK (fiber >= 0),
+    CHECK (zinc >= 0),
+    CHECK (magnesium >= 0),
+    CHECK (potassium >= 0)
+);
+    
+    
+    CREATE TABLE `recipe_application`.`instructions` (
+  `instruction` TEXT NOT NULL,
+  `instruction_order` INT UNSIGNED NOT NULL,
+  `recipe_id` BINARY(16) NOT NULL,
+  PRIMARY KEY (`instruction_order`, `recipe_id`),
+  INDEX `fk_recipe_id_instructions_idx` (`recipe_id` ASC) VISIBLE,
+  CONSTRAINT `fk_recipe_id_instructions`
+    FOREIGN KEY (`recipe_id`)
+    REFERENCES `recipe_application`.`recipe` (`recipe_id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE);
+    
+    
+    CREATE TABLE `recipe_application`.`ingredients` (
+  `ingredient_name` VARCHAR(120) NOT NULL,
+  `grams` INT UNSIGNED NOT NULL,
+  `recipe_id` BINARY(16) NOT NULL,
+  PRIMARY KEY (`ingredient_name`, `recipe_id`),
+  INDEX `fk_recipe_id_ingredients_idx` (`recipe_id` ASC) VISIBLE,
+  CONSTRAINT `fk_recipe_id_ingredients`
+    FOREIGN KEY (`recipe_id`)
+    REFERENCES `recipe_application`.`recipe` (`recipe_id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE);
+    
+    
+    CREATE TABLE `recipe_application`.`followers` (
+  `user_id` BINARY(16) NOT NULL,
+  `chef_id` BINARY(16) NOT NULL,
+  PRIMARY KEY (`user_id`, `chef_id`),
+  INDEX `fk_chef_id_followers_idx` (`chef_id` ASC) VISIBLE,
+  CONSTRAINT `fk_user_id_followers`
+    FOREIGN KEY (`user_id`)
+    REFERENCES `recipe_application`.`user` (`user_id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_chef_id_followers`
+    FOREIGN KEY (`chef_id`)
+    REFERENCES `recipe_application`.`chef` (`user_id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE);
+    
+    
+    CREATE TABLE `recipe_application`.`favorites` (
+  `user_id` BINARY(16) NOT NULL,
+  `recipe_id` BINARY(16) NOT NULL,
+  PRIMARY KEY (`user_id`, `recipe_id`),
+  INDEX `fk_recipe_id_favorites_idx` (`recipe_id` ASC) VISIBLE,
+  CONSTRAINT `fk_user_id_favorites`
+    FOREIGN KEY (`user_id`)
+    REFERENCES `recipe_application`.`user` (`user_id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_recipe_id_favorites`
+    FOREIGN KEY (`recipe_id`)
+    REFERENCES `recipe_application`.`recipe` (`recipe_id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE);
+    
+    
+    CREATE TABLE `recipe_application`.`chef_speciality` (
+  `speciality_id` BINARY(16) NOT NULL,
+  `speciality` VARCHAR(75) NOT NULL,
+  PRIMARY KEY (`speciality_id`),
+  UNIQUE INDEX `speciality_id_UNIQUE` (`speciality_id` ASC) VISIBLE,
+  UNIQUE INDEX `speciality_UNIQUE` (`speciality` ASC) VISIBLE);
+    
+    
+    
+    CREATE TABLE `recipe_application`.`chef_speciality_link` (
+  `chef_id` BINARY(16) NOT NULL,
+  `speciality_id` BINARY(16) NOT NULL,
+  PRIMARY KEY (`chef_id`, `speciality_id`),
+  INDEX `fk_spec_id_spec_idx` (`speciality_id` ASC) VISIBLE,
+  CONSTRAINT `fk_chef_id_speciality`
+    FOREIGN KEY (`chef_id`)
+    REFERENCES `recipe_application`.`chef` (`user_id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_spec_id_spec`
+    FOREIGN KEY (`speciality_id`)
+    REFERENCES `recipe_application`.`chef_speciality` (`speciality_id`)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE);
+    
+    
+    
+  
