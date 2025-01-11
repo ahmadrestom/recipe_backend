@@ -1,5 +1,5 @@
 package com.application.Recipe.Enums;
 
-public enum role {
+public enum Role {
 	USER, ADMIN, CHEF
 }

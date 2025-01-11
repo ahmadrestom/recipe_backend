@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import com.application.Recipe.CompositeKeys.ReviewId;
 import com.application.Recipe.DTO.GetReviewDTO;
+import com.application.Recipe.DTO.ReviewUserData;
 import com.application.Recipe.Models.Recipe;
 import com.application.Recipe.Models.Review;
 import com.application.Recipe.Models.user;
@@ -47,11 +48,17 @@ public class ReviewServiceImplementation implements ReviewService{
 		Set<GetReviewDTO>  dtos = new HashSet<>();
 		
 		for(Review review: reviews) {
+			ReviewUserData u = ReviewUserData.builder()
+					.firstName(review.getUser().getFirstName())
+					.lastName(review.getUser().getLastName())
+					.imageUrl(review.getUser().getImage_url())
+					.userId(review.getUser().getId())
+					.build();
+					
 			GetReviewDTO dto = GetReviewDTO.builder()
-					.text(review.getText())
-					.likes(review.getLikes())
-					.dislikes(review.getDislikes())
+					.text(review.getText().replaceAll("\r\n", " ").trim())
 					.timeUploaded(review.getTimeUploaded())
+					.user(u)
 					.build();
 			dtos.add(dto);
 		}
@@ -109,7 +116,7 @@ public class ReviewServiceImplementation implements ReviewService{
 	    return createdReview; 
 	}
 
-	@Transactional
+	/*@Transactional
 	@Override
 	public void likeReview(UUID recipeId, UUID userId){
 		
@@ -189,7 +196,7 @@ public class ReviewServiceImplementation implements ReviewService{
 			throw new RuntimeException("Should dislike to undislike");
 		}
 		
-	}
+	}*/
 	
 	
 

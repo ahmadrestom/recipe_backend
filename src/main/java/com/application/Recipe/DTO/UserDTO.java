@@ -2,6 +2,8 @@ package com.application.Recipe.DTO;
 
 import java.util.UUID;
 
+import com.application.Recipe.Enums.Role;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,5 +20,6 @@ public class UserDTO {
 	private String lastName;
 	private String email;
 	private String imageUrl;
+	private Role role;
 
 }

@@ -12,7 +12,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import com.application.Recipe.DTO.ChefDTO;
 import com.application.Recipe.DTO.UserFavoritesDTO;
-import com.application.Recipe.Enums.role;
+import com.application.Recipe.Enums.Role;
 import com.application.Recipe.Models.Recipe;
 import com.application.Recipe.Models.chef;
 import com.application.Recipe.Models.user;
@@ -113,7 +113,7 @@ public class UserServiceImplementation implements UserService{
             // Check if the user is not already a chef
             if (!(existingUser instanceof chef)) {
                 // Update user role to "chef" and insert chef information
-            	existingUser.setRole(role.CHEF);
+            	existingUser.setRole(Role.CHEF);
             	user_repository.upgradeUserToChef(existingUser.getId(), chefDTO.getLocation(), chefDTO.getPhone_number(),
                         chefDTO.getBio(), chefDTO.getYears_experience());
                 return true;

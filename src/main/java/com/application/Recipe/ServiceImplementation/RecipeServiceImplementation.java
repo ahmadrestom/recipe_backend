@@ -19,6 +19,7 @@ import com.application.Recipe.DTO.IngredientDTO;
 import com.application.Recipe.DTO.InstructionDTO;
 import com.application.Recipe.DTO.NutritionInformationDTOForRecipe;
 import com.application.Recipe.DTO.POSTRecipeDTO;
+import com.application.Recipe.DTO.ReviewUserData;
 import com.application.Recipe.DTO.GetReviewDTO;
 import com.application.Recipe.DTO.categoryDTO_forRecipeGET;
 import com.application.Recipe.DTO.chefDTO_forRecipeGET;
@@ -121,12 +122,20 @@ public class RecipeServiceImplementation implements RecipeService{
 		
 		Set<GetReviewDTO> reviews = new HashSet<>();
 		for(Review r: recipe.getReviews()) {
+			
+			ReviewUserData u = ReviewUserData.builder()
+					.firstName(r.getUser().getFirstName())
+					.lastName(r.getUser().getLastName())
+					.imageUrl(r.getUser().getImage_url())
+					.userId(r.getUser().getId())
+					.build();
+			
 			GetReviewDTO dto = GetReviewDTO.builder()
 					.text(r.getText())
-					.likes(r.getLikes())
-					.dislikes(r.getDislikes())
+					//.likes(r.getLikes())
+					//.dislikes(r.getDislikes())
 					.timeUploaded(r.getTimeUploaded())
-					.userId(r.getUser().getId())
+					.user(u)
 					.build();
 			reviews.add(dto);
 		}

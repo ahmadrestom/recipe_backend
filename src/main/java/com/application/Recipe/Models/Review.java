@@ -30,10 +30,10 @@ public class Review {
 	private ReviewId id;
 	@Column(name="text", nullable=false)
 	private String text;
-	@Column(name="likes", nullable=false)
+	/*@Column(name="likes", nullable=false)
 	private Integer likes;
 	@Column(name="dislikes", nullable=false)
-	private Integer dislikes;
+	private Integer dislikes;*/
 	@Column(name="time_uploaded", nullable=false)
 	private LocalDateTime timeUploaded;
 	
@@ -49,8 +49,8 @@ public class Review {
 	@PrePersist
     protected void onCreate() {
         timeUploaded = LocalDateTime.now();
-        likes = 0;
-        dislikes = 0;
+        //likes = 0;
+        //dislikes = 0;
     }
 	
 	

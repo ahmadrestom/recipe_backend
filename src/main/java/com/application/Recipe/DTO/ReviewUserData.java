@@ -1,6 +1,8 @@
 package com.application.Recipe.DTO;
 
-import java.time.LocalDateTime;
+
+import java.util.UUID;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -12,11 +14,10 @@ import lombok.Setter;
 @NoArgsConstructor
 @Setter
 @Getter
-public class GetReviewDTO {
-	
-	private String text;
-	//private Integer likes;
-	//private Integer dislikes;
-	private LocalDateTime timeUploaded;
-	private ReviewUserData user;
+public class ReviewUserData {
+	private String imageUrl;
+	private String firstName;
+	private String lastName;
+	private UUID userId;
+
 }

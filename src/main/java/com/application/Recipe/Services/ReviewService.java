@@ -18,7 +18,7 @@ public interface ReviewService {
 	@Transactional
 	public Review addReview(UUID recipeId, String review);
 	
-	@Transactional
+	/*@Transactional
 	public void likeReview(UUID recipeId, UUID userId);
 	
 	@Transactional
@@ -29,5 +29,5 @@ public interface ReviewService {
 	
 	@Transactional
 	public void undislikeReview(UUID recipeId, UUID userId);
-
+    */
 }

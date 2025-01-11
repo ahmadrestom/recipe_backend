@@ -7,7 +7,7 @@ import java.util.UUID;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import com.application.Recipe.Enums.role;
+import com.application.Recipe.Enums.Role;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -76,7 +76,7 @@ public class user implements UserDetails{
 	
 	@Column(name = "role", nullable =false)
 	@Enumerated(EnumType.STRING)
-	private role role;
+	private Role role;
 	
 	@OneToMany(mappedBy = "user", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference

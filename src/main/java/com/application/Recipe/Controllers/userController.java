@@ -47,6 +47,7 @@ public class userController {
 					.lastName(user.getLastName())
 					.email(user.getEmail())
 					.imageUrl(user.getImage_url())
+					.role(user.getRole())
 					.build();
 			return ResponseEntity.ok(userDTO);
 		}else {

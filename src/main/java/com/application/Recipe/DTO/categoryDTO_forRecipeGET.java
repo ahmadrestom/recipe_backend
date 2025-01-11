@@ -13,8 +13,8 @@ import lombok.Setter;
 @Getter
 public class categoryDTO_forRecipeGET {
 	
-	private UUID categoryId;
+	private UUID category_id;
 	
-	private String categoryName;
+	private String category_name;
 
 }

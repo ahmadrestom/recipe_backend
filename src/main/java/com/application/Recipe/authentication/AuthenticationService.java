@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.application.Recipe.Config.JwtService;
-import com.application.Recipe.Enums.role;
+import com.application.Recipe.Enums.Role;
 import com.application.Recipe.Models.user;
 import com.application.Recipe.Repository.UserRepository;
 
@@ -32,7 +32,7 @@ public class AuthenticationService {
 				.lastName(request.getLastName())
 				.email(request.getEmail())
 				.password(passwordEncoder.encode(request.getPassword()))
-				.role(role.USER)
+				.role(Role.USER)
 				.build();
 		repository.save(userr);
 		var jwtToken = jwtService.generateToken(userr);
