@@ -8,10 +8,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @SpringBootApplication
 @EnableJpaRepositories
 public class RecipeApplication {
-	public static void main(String[] args) {
+	public static void main(String[] args){
 		SpringApplication.run(RecipeApplication.class, args);
-		
-		
 	}
 }
 

@@ -21,6 +21,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.application.Recipe.DTO.ChefDTO;
 import com.application.Recipe.DTO.UserDTO;
 import com.application.Recipe.DTO.UserFavoritesDTO;
+import com.application.Recipe.DTO.chefDTO_forRecipeGET;
+import com.application.Recipe.Models.chef;
 import com.application.Recipe.Models.recentSearch;
 import com.application.Recipe.Models.user;
 import com.application.Recipe.Services.UserService;
@@ -53,6 +55,20 @@ public class userController {
 		}else {
 			return ResponseEntity.notFound().build();
 		}
+	}
+	
+	@GetMapping("/getChefData/{chefId}")
+	public ResponseEntity<chefDTO_forRecipeGET> getCurrentChef(@PathVariable UUID chefId){
+		chefDTO_forRecipeGET chef = userService.getChefData(chefId);
+		if(chef!=null){
+			System.out.println(chef.toString());
+			return ResponseEntity.ok(chef);
+		}else {
+			System.out.println(HttpStatus.INTERNAL_SERVER_ERROR);
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+		}
+					
+		
 	}
 
 	@DeleteMapping("/deleteUser/{email}")

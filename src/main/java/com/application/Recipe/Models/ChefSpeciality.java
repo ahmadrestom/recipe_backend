@@ -21,7 +21,7 @@ public class ChefSpeciality {
 	
 	
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(name="speciality_id", nullable=false)
 	private UUID specialityId;
 	

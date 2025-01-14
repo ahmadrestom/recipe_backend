@@ -7,11 +7,15 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
+
 import com.application.Recipe.DTO.ChefDTO;
 import com.application.Recipe.DTO.UserFavoritesDTO;
+import com.application.Recipe.DTO.chefDTO_forRecipeGET;
 import com.application.Recipe.Enums.Role;
 import com.application.Recipe.Models.Recipe;
 import com.application.Recipe.Models.chef;
@@ -37,6 +41,32 @@ public class UserServiceImplementation implements UserService{
 	
 	@Autowired
 	RecipeRepository recipeRepository;
+	
+	@Override
+	public chefDTO_forRecipeGET getChefData(UUID id){
+		UserDetails userDetails = (UserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		String email = userDetails.getUsername();
+		user u = user_repository.findByEmail(email).orElse(null);
+		if(u!=null) {
+			chef c = chefRepository.findById(u.getId()).orElse(null);
+			if(c!=null) {
+				chefDTO_forRecipeGET chefDTO = chefDTO_forRecipeGET.builder()
+						.chefId(c.getId())
+						.bio(c.getBio())
+						.firstName(c.getFirstName())
+						.lastName(c.getLastName())
+						.image_url(c.getImage_url())
+						.location(c.getLocation())
+						.phone_number(c.getPhone_number())
+						.years_experience(c.getYears_experience())
+						.build();
+				return chefDTO;
+			}
+			return null;
+		}
+		return null;
+	}
+	
 
 	@Override
 	public String createUser(user user){

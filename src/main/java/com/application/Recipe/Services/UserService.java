@@ -7,6 +7,8 @@ import java.util.UUID;
 
 import com.application.Recipe.DTO.ChefDTO;
 import com.application.Recipe.DTO.UserFavoritesDTO;
+import com.application.Recipe.DTO.chefDTO_forRecipeGET;
+import com.application.Recipe.Models.chef;
 import com.application.Recipe.Models.user;
 
 import jakarta.transaction.Transactional;
@@ -28,4 +30,6 @@ public interface UserService {
 	
 	@Transactional
 	public void unfollowChef(UUID chefId);
+	
+	public chefDTO_forRecipeGET getChefData(UUID id);
 }
