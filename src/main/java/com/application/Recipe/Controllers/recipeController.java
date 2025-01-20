@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.application.Recipe.DTO.GETRecipeDTO;
+import com.application.Recipe.DTO.GETRecipeDTOProfile;
 import com.application.Recipe.DTO.IngredientDTO;
 import com.application.Recipe.DTO.InstructionDTO;
 import com.application.Recipe.DTO.POSTRecipeDTO;
@@ -31,6 +32,18 @@ public class recipeController {
 	
 	@Autowired
 	RecipeService recipeService;
+	
+	@GetMapping("/getRecipeByChefId/{chefId}")
+	public ResponseEntity<?> getChefRecipes(@PathVariable UUID chefId){
+		List<GETRecipeDTOProfile> recipes = recipeService.getRecipeByChefId(chefId);
+		if(recipes.isEmpty()) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No recipes for the chef with id: "+chefId);
+		}else if(!recipes.isEmpty()) {
+			return ResponseEntity.ok(recipes);
+		}else {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();			
+		}
+	}
 	
 	@DeleteMapping("/deleteRecipeById/{recipeId}")
 	public ResponseEntity<?> deleteRecipeById(@PathVariable UUID recipeId)

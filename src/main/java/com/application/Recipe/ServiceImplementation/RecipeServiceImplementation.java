@@ -11,10 +11,10 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import com.application.Recipe.CompositeKeys.IngredientId;
 import com.application.Recipe.CompositeKeys.InstructionId;
 import com.application.Recipe.DTO.GETRecipeDTO;
+import com.application.Recipe.DTO.GETRecipeDTOProfile;
 import com.application.Recipe.DTO.IngredientDTO;
 import com.application.Recipe.DTO.InstructionDTO;
 import com.application.Recipe.DTO.NutritionInformationDTOForRecipe;
@@ -59,6 +59,22 @@ public class RecipeServiceImplementation implements RecipeService{
 	
 	@Autowired
 	InstructionsRepository instructionRepository;
+
+	public List<GETRecipeDTOProfile> getRecipeByChefId(UUID chefId){
+		List<Recipe> recipes = recipeRepository.findAllByChefId(chefId);
+		List<GETRecipeDTOProfile> recipeDTO = new ArrayList<>();
+		recipes.forEach(e ->{
+			GETRecipeDTOProfile recipe = GETRecipeDTOProfile.builder()
+					.recipeId(e.getRecipeId())
+					.recipeName(e.getRecipeName())
+					.preparationTime(e.getPreparationTime())
+					.rating(e.getRating())
+					.imageUrl(e.getImageUrl())
+					.build();
+			recipeDTO.add(recipe);
+		});
+		return recipeDTO;
+	}
 	
 	@Override
 	public Optional<Recipe> getRecipeById(UUID recipeId) {
@@ -251,7 +267,6 @@ public class RecipeServiceImplementation implements RecipeService{
 		Recipe recipe = Recipe.builder()
 				.recipeName(pOSTRecipeDTO.getRecipeName())
 				.description(pOSTRecipeDTO.getDescription())
-				//.timeUploaded(pOSTRecipeDTO.getTimeUploaded())
 				.preparationTime(pOSTRecipeDTO.getPreparationTime())
 				.cookingTime(pOSTRecipeDTO.getCookingTime())
 				.difficultyLevel(pOSTRecipeDTO.getDifficultyLevel())

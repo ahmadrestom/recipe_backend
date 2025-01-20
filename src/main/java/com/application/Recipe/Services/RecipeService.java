@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import com.application.Recipe.DTO.GETRecipeDTO;
+import com.application.Recipe.DTO.GETRecipeDTOProfile;
 import com.application.Recipe.DTO.IngredientDTO;
 import com.application.Recipe.DTO.InstructionDTO;
 import com.application.Recipe.DTO.POSTRecipeDTO;
@@ -40,4 +41,6 @@ public interface RecipeService {
 	public	Set<IngredientDTO> GetRecipeIngredients(String recipeName);
 	
 	public List<InstructionDTO> getRecipeInstructions(String recipeName);
+	
+	public List<GETRecipeDTOProfile> getRecipeByChefId(UUID chefId);
 }

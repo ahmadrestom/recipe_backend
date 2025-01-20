@@ -44,11 +44,11 @@ public class UserServiceImplementation implements UserService{
 	
 	@Override
 	public chefDTO_forRecipeGET getChefData(UUID id){
-		UserDetails userDetails = (UserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		String email = userDetails.getUsername();
-		user u = user_repository.findByEmail(email).orElse(null);
-		if(u!=null) {
-			chef c = chefRepository.findById(u.getId()).orElse(null);
+		//UserDetails userDetails = (UserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		//String email = userDetails.getUsername();
+		//user u = user_repository.findByEmail(email).orElse(null);
+		//if(u!=null) {
+			chef c = chefRepository.findById(id).orElse(null);
 			if(c!=null) {
 				chefDTO_forRecipeGET chefDTO = chefDTO_forRecipeGET.builder()
 						.chefId(c.getId())
@@ -64,8 +64,8 @@ public class UserServiceImplementation implements UserService{
 			}
 			return null;
 		}
-		return null;
-	}
+		//return null;
+	//}
 	
 
 	@Override

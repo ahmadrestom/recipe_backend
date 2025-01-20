@@ -103,7 +103,7 @@ public class userController {
 		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		String currentUserEmail = userDetails.getUsername();
 		Optional<user> currentUserOptional = userService.getUserByEmail(currentUserEmail);
-		if(currentUserOptional.isPresent()) {
+		if(currentUserOptional.isPresent()){
 			user currentUser = currentUserOptional.get();
 			chefDTO.setUserId(currentUser.getId());
 			boolean isUpgraded = userService.upgradeToChef(chefDTO);
