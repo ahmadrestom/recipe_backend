@@ -165,9 +165,9 @@ public class UserServiceImplementation implements UserService{
 			throw new EntityNotFoundException("User not found");
 		
 		user user = userOptional.get();
-		if(user instanceof chef){
-			throw new IllegalStateException("A chef cannot follow anther chef.");
-		}
+//		if(user instanceof chef){
+//			throw new IllegalStateException("A chef cannot follow anther chef.");
+//		}
 		chef chef = chefRepository.findById(chefId)
 				.orElseThrow(()->new RuntimeException("Chef not found."));
 		
