@@ -19,10 +19,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.application.Recipe.DTO.ChefDTO;
+import com.application.Recipe.DTO.FollowerDTO;
+import com.application.Recipe.DTO.FollowerStatsDTO;
 import com.application.Recipe.DTO.UserDTO;
 import com.application.Recipe.DTO.UserFavoritesDTO;
 import com.application.Recipe.DTO.chefDTO_forRecipeGET;
-import com.application.Recipe.Models.chef;
 import com.application.Recipe.Models.recentSearch;
 import com.application.Recipe.Models.user;
 import com.application.Recipe.Services.UserService;
@@ -175,6 +176,26 @@ public class userController {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 		}
 	}
+	
+	@GetMapping("/getAllFollowers/{chefId}")
+	public ResponseEntity<?> getAllFollowers(@PathVariable UUID chefId)
+	{
+		try {
+			Set<FollowerDTO> followers = userService.getAllFollowers(chefId);
+			return ResponseEntity.ok(followers);
+		}catch(EntityNotFoundException e){
+			return ResponseEntity.notFound().build();						
+		}catch(Exception e){
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+		}
+	}
+	
+	@GetMapping("/getFollowStats/{id}")
+    public ResponseEntity<FollowerStatsDTO> getFollowerStats(@PathVariable UUID id) {
+
+		FollowerStatsDTO statsDTO = userService.getFollowerStats(id);
+        return ResponseEntity.ok(statsDTO);
+    }
 	
 	
 	@PostMapping("/addFavoriteRecipe/{recipeId}")

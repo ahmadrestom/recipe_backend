@@ -6,6 +6,8 @@ import java.util.Set;
 import java.util.UUID;
 
 import com.application.Recipe.DTO.ChefDTO;
+import com.application.Recipe.DTO.FollowerDTO;
+import com.application.Recipe.DTO.FollowerStatsDTO;
 import com.application.Recipe.DTO.UserFavoritesDTO;
 import com.application.Recipe.DTO.chefDTO_forRecipeGET;
 import com.application.Recipe.Models.chef;
@@ -31,5 +33,10 @@ public interface UserService {
 	@Transactional
 	public void unfollowChef(UUID chefId);
 	
+	@Transactional
+	public Set<FollowerDTO> getAllFollowers(UUID chefId);
+	
 	public chefDTO_forRecipeGET getChefData(UUID id);
+	
+	public FollowerStatsDTO getFollowerStats(UUID chefId);
 }

@@ -92,7 +92,7 @@ public class user implements UserDetails{
 	private Set<Recipe> favorites;
 	
 	@ManyToMany(mappedBy="followers")
-	private Set<chef> followingChefs;
+	private Set<chef> following;
 	
 	@OneToMany(mappedBy="user", fetch=FetchType.LAZY)
 	private Set<Review> reviews;

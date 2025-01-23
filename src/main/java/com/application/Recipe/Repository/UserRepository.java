@@ -6,6 +6,7 @@ import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.application.Recipe.Models.user;
@@ -23,4 +24,7 @@ public interface UserRepository extends JpaRepository<user ,UUID>{
             "VALUES (?1, ?2, ?3, ?4, ?5)", nativeQuery = true)
     void upgradeUserToChef(UUID userId, String location, String phoneNumber, String bio, Integer yearsExperience);
 	boolean existsByEmail(String email);
+	
+	@Query("SELECT SIZE(u.following) FROM user u WHERE u.id = :userId")
+    int countFollowing(@Param("userId") UUID userId);
 }

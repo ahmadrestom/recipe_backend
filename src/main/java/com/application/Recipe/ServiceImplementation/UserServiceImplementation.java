@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import com.application.Recipe.DTO.ChefDTO;
+import com.application.Recipe.DTO.FollowerDTO;
+import com.application.Recipe.DTO.FollowerStatsDTO;
 import com.application.Recipe.DTO.UserFavoritesDTO;
 import com.application.Recipe.DTO.chefDTO_forRecipeGET;
 import com.application.Recipe.Enums.Role;
@@ -171,7 +173,7 @@ public class UserServiceImplementation implements UserService{
 		chef chef = chefRepository.findById(chefId)
 				.orElseThrow(()->new RuntimeException("Chef not found."));
 		
-		user.getFollowingChefs().add(chef);
+		user.getFollowing().add(chef);
 		
 		chef.getFollowers().add(user);
 		chefRepository.save(chef);
@@ -190,12 +192,56 @@ public class UserServiceImplementation implements UserService{
 		chef chef = chefRepository.findById(chefId)
 				.orElseThrow(()->new RuntimeException("Chef not found."));
 		user user = userOptional.get();
-		user.getFollowingChefs().remove(chef);
+		user.getFollowing().remove(chef);
 		chef.getFollowers().remove(user);
 		chefRepository.save(chef);
 		user_repository.save(user);
 		
 	}
+	
+	@Transactional
+	@Override
+	public Set<FollowerDTO> getAllFollowers(UUID chefId) {
+	    chef chef = chefRepository.findById(chefId)
+	            .orElseThrow(() -> new RuntimeException("Chef not found."));
+
+	    Set<user> followers = chef.getFollowers(); // Assuming you have a "followers" field in your chef entity
+	    Set<FollowerDTO> dtos = new HashSet<FollowerDTO>();
+	    for(user follower : followers){
+	    	FollowerDTO dto = FollowerDTO.builder()
+	    			.id(follower.getId())
+	    			.firstName(follower.getFirstName())
+	    			.lastName(follower.getLastName())
+	    			.imageUrl(follower.getImage_url())
+	    			.role(follower.getRole())
+	    			.build();
+	    	dtos.add(dto);
+	    }
+	    
+	    if (followers.isEmpty()) {
+	        throw new RuntimeException("This chef has no followers.");
+	    }
+
+	    return dtos;
+	}
+	
+	@Override
+	public FollowerStatsDTO getFollowerStats(UUID id) {
+		Optional<chef> chef = chefRepository.findById(id);
+		if(chef.isPresent()) {
+			int followersCount = chefRepository.countFollowers(id);
+	        int followingCount = chefRepository.countFollowing(id);
+	        return new FollowerStatsDTO(followersCount, followingCount);
+		}
+		Optional<user> user = user_repository.findById(id);
+        if (user.isPresent()) {
+            int followingCount = user_repository.countFollowing(id);
+            return new FollowerStatsDTO(0,followingCount);
+        }
+        throw new EntityNotFoundException("Chef or User not found with ID: " + id);
+        
+        
+    }
 	
 	@Override
 	public boolean addFavoriteRecipe(UUID recipeId){
