@@ -11,5 +11,5 @@ import com.application.Recipe.Models.Follow;
 @Repository
 public interface FollowRepository extends JpaRepository<Follow, FollowId>{
 	
-	boolean existsByFollowId_UserIdAndFollowId_ChefId(UUID userId, UUID chefId);
+	boolean existsByUser_IdAndChef_Id(UUID userId, UUID chefId);
 }

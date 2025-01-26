@@ -20,6 +20,7 @@ public interface UserService {
 	public boolean updateUser(user user);
 	public boolean deleteUserByEmail(String email);
 	public Optional<user> getUserById(UUID user_id);
+	public void UpdateUserPicture(UUID userId, String imageUrl);
 	public List<user> getAllUsers();
 	Optional<user> getUserByEmail(String user_email);
 	public boolean upgradeToChef(ChefDTO chefDTO);
@@ -35,6 +36,9 @@ public interface UserService {
 	
 	@Transactional
 	public Set<FollowerDTO> getAllFollowers(UUID chefId);
+	
+	@Transactional
+	public Set<FollowerDTO> getAllFollowings(UUID userId);
 	
 	public chefDTO_forRecipeGET getChefData(UUID id);
 	

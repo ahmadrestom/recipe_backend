@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.application.Recipe.DTO.ChefDTO;
 import com.application.Recipe.DTO.FollowerDTO;
 import com.application.Recipe.DTO.FollowerStatsDTO;
+import com.application.Recipe.DTO.UpdateImageUrlDTO;
 import com.application.Recipe.DTO.UserDTO;
 import com.application.Recipe.DTO.UserFavoritesDTO;
 import com.application.Recipe.DTO.chefDTO_forRecipeGET;
@@ -57,6 +58,12 @@ public class userController {
 			return ResponseEntity.notFound().build();
 		}
 	}
+	
+	@PutMapping("/updateImage/{id}")
+    public ResponseEntity<String> updateImageUrl(@PathVariable UUID id, @RequestBody UpdateImageUrlDTO request) {
+        userService.UpdateUserPicture(id, request.getImageUrl());
+        return ResponseEntity.ok("Image URL updated successfully");
+    }
 	
 	@GetMapping("/getChefData/{chefId}")
 	public ResponseEntity<chefDTO_forRecipeGET> getCurrentChef(@PathVariable UUID chefId){
@@ -182,6 +189,19 @@ public class userController {
 	{
 		try {
 			Set<FollowerDTO> followers = userService.getAllFollowers(chefId);
+			return ResponseEntity.ok(followers);
+		}catch(EntityNotFoundException e){
+			return ResponseEntity.notFound().build();						
+		}catch(Exception e){
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+		}
+	}
+	
+	@GetMapping("/getAllFollowing/{userId}")
+	public ResponseEntity<?> getAllFollowings(@PathVariable UUID userId)
+	{
+		try {
+			Set<FollowerDTO> followers = userService.getAllFollowings(userId);
 			return ResponseEntity.ok(followers);
 		}catch(EntityNotFoundException e){
 			return ResponseEntity.notFound().build();						

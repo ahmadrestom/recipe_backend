@@ -18,11 +18,11 @@ public class Follow {
     private FollowId id;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id",insertable=false, updatable=false)
     private user user;
 
     @ManyToOne
-    @JoinColumn(name = "chef_id")
+    @JoinColumn(name = "chef_id",insertable=false, updatable=false)
     private chef chef;
 
     // Constructors, getters, setters

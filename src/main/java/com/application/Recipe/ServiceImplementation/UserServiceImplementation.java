@@ -75,6 +75,13 @@ public class UserServiceImplementation implements UserService{
 		user_repository.save(user);
 		return "User Created Successfully";
 	}
+	
+	@Override
+	public void UpdateUserPicture(UUID userId, String imageUrl){
+		user user = user_repository.findById(userId).orElseThrow(()->new RuntimeException("User not found"));		
+		user.setImage_url(imageUrl);
+		user_repository.save(user);
+	}
 
 	@Override
 	public boolean updateUser(user user) {
@@ -206,6 +213,32 @@ public class UserServiceImplementation implements UserService{
 	            .orElseThrow(() -> new RuntimeException("Chef not found."));
 
 	    Set<user> followers = chef.getFollowers(); // Assuming you have a "followers" field in your chef entity
+	    Set<FollowerDTO> dtos = new HashSet<FollowerDTO>();
+	    for(user follower : followers){
+	    	FollowerDTO dto = FollowerDTO.builder()
+	    			.id(follower.getId())
+	    			.firstName(follower.getFirstName())
+	    			.lastName(follower.getLastName())
+	    			.imageUrl(follower.getImage_url())
+	    			.role(follower.getRole())
+	    			.build();
+	    	dtos.add(dto);
+	    }
+	    
+	    if (followers.isEmpty()) {
+	        throw new RuntimeException("This chef has no followers.");
+	    }
+
+	    return dtos;
+	}
+	
+	@Transactional
+	@Override
+	public Set<FollowerDTO> getAllFollowings(UUID userId){
+	    user user = user_repository.findById(userId)
+	            .orElseThrow(() -> new RuntimeException("User not found."));
+
+	    Set<chef> followers = user.getFollowing(); // Assuming you have a "followers" field in your chef entity
 	    Set<FollowerDTO> dtos = new HashSet<FollowerDTO>();
 	    for(user follower : followers){
 	    	FollowerDTO dto = FollowerDTO.builder()
