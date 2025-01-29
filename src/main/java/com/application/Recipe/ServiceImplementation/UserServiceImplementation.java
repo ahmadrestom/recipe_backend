@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import com.application.Recipe.FirebaseService;
 import com.application.Recipe.DTO.ChefDTO;
 import com.application.Recipe.DTO.FollowerDTO;
 import com.application.Recipe.DTO.FollowerStatsDTO;
@@ -20,11 +21,13 @@ import com.application.Recipe.DTO.UserFavoritesDTO;
 import com.application.Recipe.DTO.chefDTO_forRecipeGET;
 import com.application.Recipe.Enums.Role;
 import com.application.Recipe.Models.Recipe;
+import com.application.Recipe.Models.UserToken;
 import com.application.Recipe.Models.chef;
 import com.application.Recipe.Models.user;
 import com.application.Recipe.Repository.ChefRepository;
 import com.application.Recipe.Repository.RecipeRepository;
 import com.application.Recipe.Repository.UserRepository;
+import com.application.Recipe.Repository.UserTokenRepository;
 import com.application.Recipe.Services.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -43,6 +46,12 @@ public class UserServiceImplementation implements UserService{
 	
 	@Autowired
 	RecipeRepository recipeRepository;
+	
+	@Autowired
+    private FirebaseService firebaseService;
+	
+	@Autowired
+    private UserTokenRepository userTokenRepository;
 	
 	@Override
 	public chefDTO_forRecipeGET getChefData(UUID id){
@@ -174,17 +183,23 @@ public class UserServiceImplementation implements UserService{
 			throw new EntityNotFoundException("User not found");
 		
 		user user = userOptional.get();
-//		if(user instanceof chef){
-//			throw new IllegalStateException("A chef cannot follow anther chef.");
-//		}
 		chef chef = chefRepository.findById(chefId)
 				.orElseThrow(()->new RuntimeException("Chef not found."));
-		
+
 		user.getFollowing().add(chef);
-		
 		chef.getFollowers().add(user);
 		chefRepository.save(chef);
 		user_repository.save(user);
+		
+		UserToken chefToken = userTokenRepository.findByUserId(chefId).orElseThrow(()->new RuntimeException("Can't find token"));
+		String messageTitle = "New Follower!";
+		String messageBody = user.getFirstName()+" "+user.getLastName()+" started following you";
+		try {
+			firebaseService.sendNotification(chefToken.getToken(), messageTitle, messageBody);
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new RuntimeException("An error occured: "+e);
+		}
 		
 	}
 	

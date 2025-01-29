@@ -12,11 +12,13 @@ import jakarta.annotation.PostConstruct;
 import java.io.FileInputStream;
 import java.io.IOException;
 
+import org.springframework.stereotype.Service;
+
+@Service
 public class FirebaseService{
 
     @PostConstruct
     public void init() throws IOException {
-        // Initialize Firebase Admin SDK with the service account
         FileInputStream serviceAccount = new FileInputStream("src/main/resources/reicpe-application-firebase-adminsdk-vxh9d-aaed196116.json");
         FirebaseOptions options =  FirebaseOptions.builder()
                 .setCredentials(GoogleCredentials.fromStream(serviceAccount))
@@ -24,7 +26,7 @@ public class FirebaseService{
         FirebaseApp.initializeApp(options);
     }
 
-    public void sendNotification(String token, String title, String body) throws Exception {
+    public void sendNotification(String token, String title, String body) throws Exception{
         // Build the notification using the builder pattern
         Notification notification = Notification.builder()
                 .setTitle(title)

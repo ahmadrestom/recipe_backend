@@ -167,6 +167,7 @@ public class userController {
 		}catch(EntityNotFoundException e){
 			return ResponseEntity.notFound().build();
 		}catch(Exception e) {
+			System.out.println("ERROR: "+e);
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 		}
 	}

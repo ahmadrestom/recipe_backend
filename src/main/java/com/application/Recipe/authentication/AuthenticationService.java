@@ -9,8 +9,10 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.application.Recipe.Config.JwtService;
 import com.application.Recipe.Enums.Role;
+import com.application.Recipe.Models.UserToken;
 import com.application.Recipe.Models.user;
 import com.application.Recipe.Repository.UserRepository;
+import com.application.Recipe.Repository.UserTokenRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -22,6 +24,7 @@ public class AuthenticationService {
 	private final PasswordEncoder passwordEncoder;
 	private final JwtService jwtService;
 	private final AuthenticationManager authenticationManager;
+
 	
 	public AuthenticationResponse register(RegisterRequest request) {
 		if (repository.existsByEmail(request.getEmail())) {
@@ -35,6 +38,7 @@ public class AuthenticationService {
 				.role(Role.USER)
 				.build();
 		repository.save(userr);
+		
 		var jwtToken = jwtService.generateToken(userr);
 		return AuthenticationResponse.builder()
 				.token(jwtToken)
@@ -50,6 +54,7 @@ public class AuthenticationService {
 		);
 		var user = repository.findByEmail(request.getEmail())
 				.orElseThrow();
+		
 		var jwtToken = jwtService.generateToken(user);
 		return AuthenticationResponse.builder()
 				.token(jwtToken)
