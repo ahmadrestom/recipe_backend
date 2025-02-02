@@ -7,12 +7,9 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
-
 import com.application.Recipe.FirebaseService;
 import com.application.Recipe.DTO.ChefDTO;
 import com.application.Recipe.DTO.FollowerDTO;
@@ -20,11 +17,13 @@ import com.application.Recipe.DTO.FollowerStatsDTO;
 import com.application.Recipe.DTO.UserFavoritesDTO;
 import com.application.Recipe.DTO.chefDTO_forRecipeGET;
 import com.application.Recipe.Enums.Role;
+import com.application.Recipe.Models.Notification;
 import com.application.Recipe.Models.Recipe;
 import com.application.Recipe.Models.UserToken;
 import com.application.Recipe.Models.chef;
 import com.application.Recipe.Models.user;
 import com.application.Recipe.Repository.ChefRepository;
+import com.application.Recipe.Repository.NotificationRepository;
 import com.application.Recipe.Repository.RecipeRepository;
 import com.application.Recipe.Repository.UserRepository;
 import com.application.Recipe.Repository.UserTokenRepository;
@@ -46,6 +45,9 @@ public class UserServiceImplementation implements UserService{
 	
 	@Autowired
 	RecipeRepository recipeRepository;
+	
+	@Autowired
+	NotificationRepository notificationRepository;
 	
 	@Autowired
     private FirebaseService firebaseService;
@@ -191,16 +193,22 @@ public class UserServiceImplementation implements UserService{
 		chefRepository.save(chef);
 		user_repository.save(user);
 		
-		UserToken chefToken = userTokenRepository.findByUserId(chefId).orElseThrow(()->new RuntimeException("Can't find token"));
-		String messageTitle = "New Follower!";
-		String messageBody = user.getFirstName()+" "+user.getLastName()+" started following you";
-		try {
-			firebaseService.sendNotification(chefToken.getToken(), messageTitle, messageBody);
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw new RuntimeException("An error occured: "+e);
-		}
+		Notification notification = new Notification();
+		notification.setUser(chef);
+		notification.setTitle("New follower!");
+		notification.setMessage(user.getFirstName()+" "+user.getLastName()+" started following you");
+		notificationRepository.save(notification);
 		
+		Optional<UserToken> chefTokenOptional = userTokenRepository.findByUserId(chefId);
+		if(chefTokenOptional.isPresent()) {
+			UserToken chefToken = chefTokenOptional.get();
+			try {
+				firebaseService.sendNotification(chefToken.getToken(), notification.getTitle(), notification.getMessage());
+			}catch(Exception e) {
+				e.printStackTrace();
+				throw new RuntimeException("Failed to send push notification "+e.getMessage());
+			}
+		}		
 	}
 	
 	@Transactional

@@ -30,6 +30,7 @@ import com.application.Recipe.Models.chef;
 import com.application.Recipe.Models.ingredient;
 import com.application.Recipe.Models.user;
 import com.application.Recipe.Models.Instruction;
+import com.application.Recipe.Models.Notification;
 import com.application.Recipe.Models.NutritionInformation;
 import com.application.Recipe.Models.Recipe;
 import com.application.Recipe.Models.Review;
@@ -38,6 +39,7 @@ import com.application.Recipe.Repository.CategoryRepository;
 import com.application.Recipe.Repository.ChefRepository;
 import com.application.Recipe.Repository.IngredientsRepository;
 import com.application.Recipe.Repository.InstructionsRepository;
+import com.application.Recipe.Repository.NotificationRepository;
 import com.application.Recipe.Repository.NutritionInformationRepository;
 import com.application.Recipe.Repository.RecipeRepository;
 import com.application.Recipe.Repository.UserTokenRepository;
@@ -67,6 +69,9 @@ public class RecipeServiceImplementation implements RecipeService{
 	
 	@Autowired
 	UserTokenRepository userTokenRepository;
+	
+	@Autowired
+	NotificationRepository notificationRepository;
 	
 	@Autowired
 	FirebaseService firebaseService;
@@ -350,13 +355,21 @@ public class RecipeServiceImplementation implements RecipeService{
 		final Set<user> followers = chef.getFollowers();
 		String messageTitle = "New recipe uploaded";
 		String messageBody = chefName+ " uploaded a new recipe. Check it out now";
-		for(user follower: followers) {
-			UserToken token = userTokenRepository.findByUserId(follower.getId()).orElseThrow(()-> new RuntimeException("Can't find token"));
-			try {
-				firebaseService.sendNotification(token.getToken(), messageTitle, messageBody);
-			}catch(Exception e) {
-				e.printStackTrace();
-				throw new RuntimeException("An error occured: "+e);
+		for(user follower: followers){
+			Notification notification = new Notification();
+			notification.setUser(follower);
+			notification.setTitle(messageTitle);
+			notification.setMessage(messageBody);
+			notificationRepository.save(notification);
+			Optional<UserToken> userTokenOptional = userTokenRepository.findByUserId(follower.getId());
+			if(userTokenOptional.isPresent()) {
+				UserToken userToken = userTokenOptional.get();
+				try {
+					firebaseService.sendNotification(userToken.getToken(),notification.getTitle(),notification.getMessage());	
+				}catch(Exception e) {
+					e.printStackTrace();
+					throw new RuntimeException("Failed to send push notification");
+				}
 			}
 		}
 		
