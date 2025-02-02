@@ -175,7 +175,7 @@ public class UserServiceImplementation implements UserService{
 
 	@Transactional
 	@Override
-	public void followChef(UUID chefId) {
+	public void followChef(UUID chefId){
 		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		String currentUserEmail = userDetails.getUsername();
 		Optional<user> userOptional = user_repository.findByEmail(currentUserEmail);

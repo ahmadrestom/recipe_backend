@@ -2,7 +2,6 @@ package com.application.Recipe.Models;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -48,5 +47,4 @@ public class Notification {
         this.title = title;
         this.message = message;
     }
-
 }

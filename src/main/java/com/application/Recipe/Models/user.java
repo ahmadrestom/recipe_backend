@@ -105,8 +105,9 @@ public class user implements UserDetails{
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		return List.of(new SimpleGrantedAuthority(role.name()));
+	    return (role != null) ? List.of(new SimpleGrantedAuthority(role.name())) : List.of();
 	}
+
 
 	@Override
 	public String getUsername() {

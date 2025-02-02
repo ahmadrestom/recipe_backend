@@ -11,6 +11,8 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.application.Recipe.FirebaseService;
 import com.application.Recipe.CompositeKeys.IngredientId;
 import com.application.Recipe.CompositeKeys.InstructionId;
 import com.application.Recipe.DTO.GETRecipeDTO;
@@ -26,16 +28,19 @@ import com.application.Recipe.DTO.chefDTO_forRecipeGET;
 import com.application.Recipe.Models.category;
 import com.application.Recipe.Models.chef;
 import com.application.Recipe.Models.ingredient;
+import com.application.Recipe.Models.user;
 import com.application.Recipe.Models.Instruction;
 import com.application.Recipe.Models.NutritionInformation;
 import com.application.Recipe.Models.Recipe;
 import com.application.Recipe.Models.Review;
+import com.application.Recipe.Models.UserToken;
 import com.application.Recipe.Repository.CategoryRepository;
 import com.application.Recipe.Repository.ChefRepository;
 import com.application.Recipe.Repository.IngredientsRepository;
 import com.application.Recipe.Repository.InstructionsRepository;
 import com.application.Recipe.Repository.NutritionInformationRepository;
 import com.application.Recipe.Repository.RecipeRepository;
+import com.application.Recipe.Repository.UserTokenRepository;
 import com.application.Recipe.Services.RecipeService;
 import jakarta.transaction.Transactional;
 
@@ -59,7 +64,13 @@ public class RecipeServiceImplementation implements RecipeService{
 	
 	@Autowired
 	InstructionsRepository instructionRepository;
-
+	
+	@Autowired
+	UserTokenRepository userTokenRepository;
+	
+	@Autowired
+	FirebaseService firebaseService;
+	
 	public List<GETRecipeDTOProfile> getRecipeByChefId(UUID chefId){
 		List<Recipe> recipes = recipeRepository.findAllByChefId(chefId);
 		List<GETRecipeDTOProfile> recipeDTO = new ArrayList<>();
@@ -334,6 +345,24 @@ public class RecipeServiceImplementation implements RecipeService{
 		savedRecipe.setIngredients(ingredients);
 		savedRecipe.setNutritionInformation(ni);
 		savedRecipe.setInstructions(instructions);
+		
+		final String chefName = chef.getFirstName()+" "+chef.getLastName();
+		final Set<user> followers = chef.getFollowers();
+		String messageTitle = "New recipe uploaded";
+		String messageBody = chefName+ " uploaded a new recipe. Check it out now";
+		for(user follower: followers) {
+			UserToken token = userTokenRepository.findByUserId(follower.getId()).orElseThrow(()-> new RuntimeException("Can't find token"));
+			try {
+				firebaseService.sendNotification(token.getToken(), messageTitle, messageBody);
+			}catch(Exception e) {
+				e.printStackTrace();
+				throw new RuntimeException("An error occured: "+e);
+			}
+		}
+		
+		
+		
+		
 		
 		return recipeRepository.save(savedRecipe);
 	}
