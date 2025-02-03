@@ -53,8 +53,9 @@ public class SpecialityChefLinkImplementation implements SpecialityChefLinkServi
 	    
 	    for (Speciality_ChefLink link : links) {
 	        SpecialityLinkDTO specialityDTO = SpecialityLinkDTO.builder()
-	            .specialityId(link.getChefSpeciality().getSpecialityId()) // Get the speciality ID
-	            .speciality(link.getChefSpeciality().getSpeciality()) // Get the speciality name
+	            .specialityId(link.getChefSpeciality().getSpecialityId())
+	            .speciality(link.getChefSpeciality().getSpeciality())
+	            .description(link.getChefSpeciality().getDescription())
 	            .build();
 
 	        specialityDTOs.add(specialityDTO);

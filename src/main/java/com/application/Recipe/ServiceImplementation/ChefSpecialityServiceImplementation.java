@@ -19,7 +19,7 @@ public class ChefSpecialityServiceImplementation implements ChefSpecialityServic
 	
 	
 	@Override
-	public boolean addSpeciality(ChefSpeciality chefSpeciality) {
+	public boolean addSpeciality(ChefSpeciality chefSpeciality){
 		ChefSpeciality savedSpeciality = chefSpecialityRepository.save(chefSpeciality);
 	    return savedSpeciality != null;
 	}

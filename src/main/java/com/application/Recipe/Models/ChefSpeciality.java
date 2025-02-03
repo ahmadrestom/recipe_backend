@@ -27,5 +27,8 @@ public class ChefSpeciality {
 	
 	@Column(name="speciality")
 	private String speciality;
+	
+	@Column(name="description")
+	private String description;
 
 }

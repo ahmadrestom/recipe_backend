@@ -13,5 +13,6 @@ public class SpecialityLinkDTO {
 	
 	private UUID specialityId;
 	private String speciality;
+	private String description;
 
 }
