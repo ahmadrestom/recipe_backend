@@ -102,6 +102,9 @@ public class user implements UserDetails{
 	
 	@OneToMany(mappedBy="user", fetch=FetchType.LAZY)
 	private Set<Review> reviews;
+	
+	@Column(name = "password_reset_token")
+    private String passwordResetToken;
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {

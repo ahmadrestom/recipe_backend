@@ -1,5 +1,8 @@
 package com.application.Recipe.authentication;
 
+import java.util.Optional;
+import java.util.UUID;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -62,4 +65,5 @@ public class AuthenticationService {
 				.id(user.getId())
 				.build();
 	}	
+	
 }
