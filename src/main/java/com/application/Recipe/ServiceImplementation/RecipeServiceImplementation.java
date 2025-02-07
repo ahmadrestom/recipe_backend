@@ -373,10 +373,20 @@ public class RecipeServiceImplementation implements RecipeService{
 			}
 		}
 		
-		
-		
-		
-		
+		Notification notification = new Notification();
+		notification.setUser(chef);	
+		notification.setTitle("Recipe uploaded successfully");
+		notification.setMessage("Your recipe "+pOSTRecipeDTO.getRecipeName()+" has been uploaded successfully");
+		notificationRepository.save(notification);
+		Optional<UserToken> chefTokenOptional = userTokenRepository.findByUserId(chef.getId());
+		if(chefTokenOptional.isPresent()) {
+			UserToken chefToken = chefTokenOptional.get();
+			try {
+				firebaseService.sendNotification(chefToken.getToken(), notification.getTitle(), notification.getMessage());
+			}catch(Exception e) {
+				throw new RuntimeException("Failed to send push notification "+e.getMessage());						
+			}
+		}
 		return recipeRepository.save(savedRecipe);
 	}
 

@@ -154,18 +154,51 @@ public class UserServiceImplementation implements UserService{
 		List<user> AllUsers= user_repository.findAll();
 		return AllUsers;
 	}
-
+/*
+ * Notification notification = new Notification();
+				notification.setUser(recipeOptional.get().getChef());
+				notification.setTitle("Recipe added to favorites");
+				notification.setMessage(
+						userOptional.get().getFirstName()+
+						" "+
+						userOptional.get().getLastName()+
+						" add your recipe "+
+						recipeOptional.get().getRecipeName()+
+						" to his favorites.");
+				notificationRepository.save(notification);
+				Optional<UserToken> chefTokenOptional = userTokenRepository.findByUserId(recipeOptional.get().getChef().getId());
+				if(chefTokenOptional.isPresent()) {
+					UserToken chefToken = chefTokenOptional.get();
+					try {
+						firebaseService.sendNotification(chefToken.getToken(), notification.getTitle(), notification.getMessage());
+					}catch(Exception e) {
+						throw new RuntimeException("Failed to send push notification "+e.getMessage());						
+					}
+				}*/
 	@Override
     public boolean upgradeToChef(ChefDTO chefDTO){
         Optional<user> userOptional = user_repository.findById(chefDTO.getUserId());
-        if (userOptional.isPresent()) {
+        if (userOptional.isPresent()){
             user existingUser = userOptional.get();
-            // Check if the user is not already a chef
             if (!(existingUser instanceof chef)) {
-                // Update user role to "chef" and insert chef information
             	existingUser.setRole(Role.CHEF);
             	user_repository.upgradeUserToChef(existingUser.getId(), chefDTO.getLocation(), chefDTO.getPhone_number(),
                         chefDTO.getBio(), chefDTO.getYears_experience());
+            	
+            	Notification notification = new Notification();
+            	notification.setUser(userOptional.get());
+            	notification.setTitle("Congratulations!");
+            	notification.setMessage("We would like to congratulate you for becoming a chef, "+userOptional.get().getFirstName()+" "+userOptional.get().getLastName());
+            	notificationRepository.save(notification);
+				Optional<UserToken> chefTokenOptional = userTokenRepository.findByUserId(userOptional.get().getId());
+				if(chefTokenOptional.isPresent()) {
+					UserToken chefToken = chefTokenOptional.get();
+					try {
+						firebaseService.sendNotification(chefToken.getToken(), notification.getTitle(), notification.getMessage());
+					}catch(Exception e) {
+						throw new RuntimeException("Failed to send push notification "+e.getMessage());						
+					}
+				}
                 return true;
             } else {
                 // User is already a chef, no need to upgrade
@@ -308,10 +341,31 @@ public class UserServiceImplementation implements UserService{
 			Optional<Recipe> recipeOptional = recipeRepository.findById(recipeId);
 			if(userOptional.isPresent() && recipeOptional.isPresent())
 			{
-				if(userOptional.get().getFavorites().contains(recipeOptional.get().getRecipeId()))
+				if(userOptional.get().getFavorites().contains(recipeOptional.get()))
 					throw new RuntimeException("Recipe is already in favorites");
 				userOptional.get().getFavorites().add(recipeOptional.get());
 				user_repository.save(userOptional.get());
+				
+				Notification notification = new Notification();
+				notification.setUser(recipeOptional.get().getChef());
+				notification.setTitle("Recipe added to favorites");
+				notification.setMessage(
+						userOptional.get().getFirstName()+
+						" "+
+						userOptional.get().getLastName()+
+						" added your recipe "+
+						recipeOptional.get().getRecipeName()+
+						" to their favorites.");
+				notificationRepository.save(notification);
+				Optional<UserToken> chefTokenOptional = userTokenRepository.findByUserId(recipeOptional.get().getChef().getId());
+				if(chefTokenOptional.isPresent()) {
+					UserToken chefToken = chefTokenOptional.get();
+					try {
+						firebaseService.sendNotification(chefToken.getToken(), notification.getTitle(), notification.getMessage());
+					}catch(Exception e) {
+						throw new RuntimeException("Failed to send push notification "+e.getMessage());						
+					}
+				}
 				return true;
 			}
 			else if(userOptional.isEmpty())
