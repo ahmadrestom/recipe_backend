@@ -1,6 +1,7 @@
 package com.application.Recipe.ServiceImplementation;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -10,15 +11,20 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import com.application.Recipe.FirebaseService;
 import com.application.Recipe.CompositeKeys.ReviewId;
 import com.application.Recipe.DTO.GetReviewDTO;
 import com.application.Recipe.DTO.ReviewUserData;
+import com.application.Recipe.Models.Notification;
 import com.application.Recipe.Models.Recipe;
 import com.application.Recipe.Models.Review;
+import com.application.Recipe.Models.UserToken;
 import com.application.Recipe.Models.user;
+import com.application.Recipe.Repository.NotificationRepository;
 import com.application.Recipe.Repository.RecipeRepository;
 import com.application.Recipe.Repository.ReviewRepository;
 import com.application.Recipe.Repository.UserRepository;
+import com.application.Recipe.Repository.UserTokenRepository;
 import com.application.Recipe.Services.ReviewService;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -35,9 +41,18 @@ public class ReviewServiceImplementation implements ReviewService{
 	
 	@Autowired 
 	UserRepository userRepository;
+	
+	@Autowired
+	NotificationRepository notificationRepository;
 
+	@Autowired
+    private FirebaseService firebaseService;
+	
+	@Autowired
+	UserTokenRepository userTokenRepository;
+	
 	@Override
-	public Set<GetReviewDTO> GetRecipeReviews(UUID recipeId) {
+	public Set<GetReviewDTO> GetRecipeReviews(UUID recipeId){
 		Recipe r = recipeRepository.findById(recipeId)
 				.orElseThrow(()-> new EntityNotFoundException("Recipe not available"));
 		
@@ -112,6 +127,29 @@ public class ReviewServiceImplementation implements ReviewService{
 	    		.build();
 	    
 	    reviewRepository.save(createdReview);
+	    
+	    Notification notification = new Notification();
+	    notification.setUser(r.getChef());
+	    notification.setTitle("New review on "+r.getRecipeName()+ " recipe");
+	    notification.setMessage(createdReview.getUser().getFirstName()+
+	    		" "+
+	    		createdReview.getUser().getLastName()+
+	    		" added a review on "+
+	    		r.getRecipeName()+
+	    		". Check it out!"
+	    		);
+	    notificationRepository.save(notification);
+	    
+	    Optional<UserToken> chefTokenOptional = userTokenRepository.findByUserId(r.getChef().getId());
+		if(chefTokenOptional.isPresent()) {
+			UserToken chefToken = chefTokenOptional.get();
+			try {
+				firebaseService.sendNotification(chefToken.getToken(), notification.getTitle(), notification.getMessage());
+			}catch(Exception e) {
+				e.printStackTrace();
+				throw new RuntimeException("Failed to send push notification "+e.getMessage());
+			}
+		}
 	    
 	    return createdReview; 
 	}
