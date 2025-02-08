@@ -3,6 +3,8 @@ package com.application.Recipe.ServiceImplementation;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -114,8 +116,10 @@ public class RecipeServiceImplementation implements RecipeService{
 	
 	@Override
 	public List<Recipe> getLatestRecipes(LocalDateTime time) {
-		LocalDateTime cutoffTime = time.minus(52, ChronoUnit.WEEKS);
-		return recipeRepository.findRecentRecipes(cutoffTime);
+		LocalDateTime cutoffTime = time.minus(1, ChronoUnit.DAYS);
+		List<Recipe> recentRecipes = recipeRepository.findRecentRecipes(cutoffTime);
+		Collections.sort(recentRecipes, Comparator.comparing(Recipe::getTimeUploaded));
+		return recentRecipes;
 	}
 	
 	@Override

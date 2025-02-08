@@ -1,9 +1,11 @@
 package com.application.Recipe.ServiceImplementation;
 
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -91,6 +93,13 @@ public class UserServiceImplementation implements UserService{
 	public void UpdateUserPicture(UUID userId, String imageUrl){
 		user user = user_repository.findById(userId).orElseThrow(()->new RuntimeException("User not found"));		
 		user.setImage_url(imageUrl);
+		user_repository.save(user);
+	}
+	
+	@Override
+	public void DeleteUserPicture(UUID userId){
+		user user = user_repository.findById(userId).orElseThrow(()->new RuntimeException("User not found"));		
+		user.setImage_url(null);
 		user_repository.save(user);
 	}
 
@@ -264,7 +273,7 @@ public class UserServiceImplementation implements UserService{
 	
 	@Transactional
 	@Override
-	public Set<FollowerDTO> getAllFollowers(UUID chefId) {
+	public Set<FollowerDTO> getAllFollowers(UUID chefId){
 	    chef chef = chefRepository.findById(chefId)
 	            .orElseThrow(() -> new RuntimeException("Chef not found."));
 
@@ -315,7 +324,7 @@ public class UserServiceImplementation implements UserService{
 	}
 	
 	@Override
-	public FollowerStatsDTO getFollowerStats(UUID id) {
+	public FollowerStatsDTO getFollowerStats(UUID id){
 		Optional<chef> chef = chefRepository.findById(id);
 		if(chef.isPresent()) {
 			int followersCount = chefRepository.countFollowers(id);
@@ -382,7 +391,7 @@ public class UserServiceImplementation implements UserService{
 	}
 	
 	@Override
-	public boolean removeFavoriteRecipe(UUID recipeId) {
+	public boolean removeFavoriteRecipe(UUID recipeId){
 	    try {
 	        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 	        String currentUserEmail = userDetails.getUsername();
@@ -410,7 +419,7 @@ public class UserServiceImplementation implements UserService{
 
 
 	@Override
-	public Set<UserFavoritesDTO> getFavoriteRecipes() {
+	public Set<UserFavoritesDTO> getFavoriteRecipes(){
 		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		String currentUserEmail = userDetails.getUsername();
 		Optional<user> userOptional = user_repository.findByEmail(currentUserEmail);
@@ -423,7 +432,7 @@ public class UserServiceImplementation implements UserService{
 		if(recipes.isEmpty())
 			throw new RuntimeException("You have no favorite recipes. Add some now!");
 		
-		Set<UserFavoritesDTO> recipeDTOs = new HashSet<>();
+		Set<UserFavoritesDTO> recipeDTOs = new TreeSet<>(Comparator.comparing(UserFavoritesDTO::getTimeUploaded).reversed());
 		
 		for(Recipe recipe:recipes) {
 			UserFavoritesDTO dto = UserFavoritesDTO.builder()

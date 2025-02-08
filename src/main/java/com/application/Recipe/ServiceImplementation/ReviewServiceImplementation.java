@@ -1,8 +1,10 @@
 package com.application.Recipe.ServiceImplementation;
 
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,34 +54,35 @@ public class ReviewServiceImplementation implements ReviewService{
 	UserTokenRepository userTokenRepository;
 	
 	@Override
-	public Set<GetReviewDTO> GetRecipeReviews(UUID recipeId){
-		Recipe r = recipeRepository.findById(recipeId)
-				.orElseThrow(()-> new EntityNotFoundException("Recipe not available"));
-		
-		Set<Review> reviews = r.getReviews();
-		if(reviews.isEmpty())
-			throw new EmptyResultDataAccessException("No reviews for this recipe",1);
-		
-		Set<GetReviewDTO>  dtos = new HashSet<>();
-		
-		for(Review review: reviews) {
-			ReviewUserData u = ReviewUserData.builder()
-					.firstName(review.getUser().getFirstName())
-					.lastName(review.getUser().getLastName())
-					.imageUrl(review.getUser().getImage_url())
-					.userId(review.getUser().getId())
-					.build();
-					
-			GetReviewDTO dto = GetReviewDTO.builder()
-					.text(review.getText().replaceAll("\r\n", " ").trim())
-					.timeUploaded(review.getTimeUploaded())
-					.user(u)
-					.build();
-			dtos.add(dto);
-		}
-		
-		return dtos;
+	public Set<GetReviewDTO> GetRecipeReviews(UUID recipeId) {
+	    Recipe r = recipeRepository.findById(recipeId)
+	            .orElseThrow(() -> new EntityNotFoundException("Recipe not available"));
+
+	    Set<Review> reviews = r.getReviews();
+	    if (reviews.isEmpty())
+	        throw new EmptyResultDataAccessException("No reviews for this recipe", 1);
+	    Set<GetReviewDTO> dtos = new TreeSet<>(Comparator.comparing(GetReviewDTO::getTimeUploaded).reversed());
+
+	    for (Review review : reviews) {
+	        ReviewUserData u = ReviewUserData.builder()
+	                .firstName(review.getUser().getFirstName())
+	                .lastName(review.getUser().getLastName())
+	                .imageUrl(review.getUser().getImage_url())
+	                .userId(review.getUser().getId())
+	                .build();
+
+	        GetReviewDTO dto = GetReviewDTO.builder()
+	                .text(review.getText().replaceAll("\r\n", " ").trim())
+	                .timeUploaded(review.getTimeUploaded())
+	                .user(u)
+	                .build();
+
+	        dtos.add(dto);
+	    }
+
+	    return dtos;
 	}
+
 
 	@Transactional
 	@Override

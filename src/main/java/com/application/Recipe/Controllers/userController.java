@@ -65,6 +65,12 @@ public class userController {
         return ResponseEntity.ok("Image URL updated successfully");
     }
 	
+	@DeleteMapping("/deleteImage/{id}")
+    public ResponseEntity<String> deleteImageUrl(@PathVariable UUID id) {
+        userService.DeleteUserPicture(id);
+        return ResponseEntity.ok("Image URL deleted successfully");
+    }
+	
 	@GetMapping("/getChefData/{chefId}")
 	public ResponseEntity<chefDTO_forRecipeGET> getCurrentChef(@PathVariable UUID chefId){
 		chefDTO_forRecipeGET chef = userService.getChefData(chefId);

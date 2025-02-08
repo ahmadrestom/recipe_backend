@@ -21,6 +21,10 @@ public interface UserService {
 	public boolean deleteUserByEmail(String email);
 	public Optional<user> getUserById(UUID user_id);
 	public void UpdateUserPicture(UUID userId, String imageUrl);
+	
+	@Transactional
+	public void DeleteUserPicture(UUID userId);
+	
 	public List<user> getAllUsers();
 	Optional<user> getUserByEmail(String user_email);
 	public boolean upgradeToChef(ChefDTO chefDTO);
