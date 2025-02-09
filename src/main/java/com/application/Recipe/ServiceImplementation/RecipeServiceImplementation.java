@@ -116,7 +116,7 @@ public class RecipeServiceImplementation implements RecipeService{
 	
 	@Override
 	public List<Recipe> getLatestRecipes(LocalDateTime time) {
-		LocalDateTime cutoffTime = time.minus(1, ChronoUnit.DAYS);
+		LocalDateTime cutoffTime = time.minus(2, ChronoUnit.DAYS);
 		List<Recipe> recentRecipes = recipeRepository.findRecentRecipes(cutoffTime);
 		Collections.sort(recentRecipes, Comparator.comparing(Recipe::getTimeUploaded));
 		return recentRecipes;
