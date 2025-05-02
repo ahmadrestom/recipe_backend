@@ -1,7 +1,5 @@
 package com.application.Recipe.authentication;
 
-import java.util.Optional;
-import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -12,10 +10,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.application.Recipe.Config.JwtService;
 import com.application.Recipe.Enums.Role;
-import com.application.Recipe.Models.UserToken;
 import com.application.Recipe.Models.user;
 import com.application.Recipe.Repository.UserRepository;
-import com.application.Recipe.Repository.UserTokenRepository;
 
 import lombok.RequiredArgsConstructor;
 

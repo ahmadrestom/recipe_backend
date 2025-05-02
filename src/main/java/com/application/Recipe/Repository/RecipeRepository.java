@@ -19,5 +19,7 @@ public interface RecipeRepository extends JpaRepository<Recipe, UUID>{
 	@Query("SELECT r FROM Recipe r WHERE r.timeUploaded >= :cutoffTime")
     List<Recipe> findRecentRecipes(@Param("cutoffTime") LocalDateTime cutoffTime);
 	List<Recipe> findAllByChefId(UUID chefId);
+	List<Recipe> findTop10ByOrderByTimeUploadedDesc();
+
 
 }
