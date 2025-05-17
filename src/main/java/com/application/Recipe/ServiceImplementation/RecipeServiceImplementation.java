@@ -12,6 +12,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.application.Recipe.FirebaseService;
@@ -47,6 +48,8 @@ import com.application.Recipe.Repository.RecipeRepository;
 import com.application.Recipe.Repository.UserTokenRepository;
 import com.application.Recipe.Services.RecipeService;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
 @Service
 public class RecipeServiceImplementation implements RecipeService{
@@ -118,11 +121,22 @@ public class RecipeServiceImplementation implements RecipeService{
 	}
 	
 	@Override
-	public List<Recipe> getAllRecipes(){
-		List<Recipe> rs = recipeRepository.findAll();
-		if(rs.isEmpty())
-			throw new RuntimeException("No recipes found");
-		return rs;
+	public List<Recipe> getAllRecipes(Integer page, Integer size) {
+	    if (page != null && size != null) {
+	        Pageable pageable = PageRequest.of(page, size);
+	        Page<Recipe> pagedResult = recipeRepository.findAll(pageable);
+
+	        if (pagedResult.hasContent()) {
+	            return pagedResult.getContent();
+	        } else {
+	            throw new RuntimeException("No recipes found for the given page.");
+	        }
+	    } else {
+	        List<Recipe> rs = recipeRepository.findAll();
+	        if (rs.isEmpty())
+	            throw new RuntimeException("No recipes found.");
+	        return rs;
+	    }
 	}
 	
 	@Override

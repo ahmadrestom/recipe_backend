@@ -135,10 +135,11 @@ public class recipeController {
 	}
 
 	@GetMapping("/getAllRecipes")
-	public ResponseEntity<?> getAllRecipes()
+	public ResponseEntity<?> getAllRecipes(@RequestParam(required = false) Integer page,
+	        @RequestParam(required = false) Integer size)
 	{
 		try {
-			List<Recipe> recipes = recipeService.getAllRecipes();
+			List<Recipe> recipes = recipeService.getAllRecipes(page,size);
 			List<GETRecipeDTO> recipeDTOs = recipeService.convertToGETRecipeDTOs(recipes);
 			return ResponseEntity.ok(recipeDTOs);
 		}catch(RuntimeException e){
