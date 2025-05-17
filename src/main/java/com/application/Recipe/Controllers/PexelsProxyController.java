@@ -1,5 +1,7 @@
 package com.application.Recipe.Controllers;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +16,7 @@ public class PexelsProxyController {
     private String apiKey;
 
     private final String PEXELS_API_URL = "https://api.pexels.com/v1/search";
+    private static final Logger log = LoggerFactory.getLogger(PexelsProxyController.class);
 
     @GetMapping
     public ResponseEntity<String> searchImages(@RequestParam String query, @RequestParam(defaultValue = "1") int perPage) {
@@ -30,6 +33,7 @@ public class PexelsProxyController {
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
             return ResponseEntity.ok(response.getBody());
         } catch (Exception e) {
+        	log.error("Error fetching Pexels for query=" + query + ", perPage=" + perPage, e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error fetching from Pexels API");
         }
     }
