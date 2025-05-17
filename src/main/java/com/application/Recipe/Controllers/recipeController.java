@@ -45,6 +45,12 @@ public class recipeController {
 		}
 	}
 	
+	@GetMapping("/getRecipesByCategoryName/{categoryName}")
+	public ResponseEntity<?> getRecipesByCategory(@PathVariable String categoryName){
+		List<GETRecipeDTO> recipes = recipeService.getRecipesByCategoryName(categoryName);
+		return ResponseEntity.ok(recipes);
+	}
+	
 	@DeleteMapping("/deleteRecipeById/{recipeId}")
 	public ResponseEntity<?> deleteRecipeById(@PathVariable UUID recipeId)
 	{

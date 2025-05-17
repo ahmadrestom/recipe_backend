@@ -51,7 +51,7 @@ public class CategoryServiceImplementation implements CategoryService{
 	@Override
 	public boolean addCategory(PostDTOCategory categoryDTO) {
 	    category category = new category();
-	    category.setCategory_name(categoryDTO.getCategory_name());
+	    category.setCategoryName(categoryDTO.getCategory_name());
 	    category savedCategory = categoryRepository.save(category);
 	    return savedCategory != null;
 	}

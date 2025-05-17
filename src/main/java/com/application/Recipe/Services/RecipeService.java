@@ -28,6 +28,8 @@ public interface RecipeService {
 	
 	public List<Recipe> getLatestRecipes(LocalDateTime time);
 	
+	public List<GETRecipeDTO> getRecipesByCategoryName(String categoryName);
+	
 	@Transactional
 	public boolean deleteRecipeById(UUID recipeId);
 	

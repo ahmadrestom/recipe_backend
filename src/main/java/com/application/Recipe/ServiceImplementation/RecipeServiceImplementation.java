@@ -78,6 +78,17 @@ public class RecipeServiceImplementation implements RecipeService{
 	@Autowired
 	FirebaseService firebaseService;
 	
+	@Override
+	public List<GETRecipeDTO> getRecipesByCategoryName(String categoryName){
+		List<Recipe> recipes = recipeRepository.findByCategory_CategoryName(categoryName);
+		List<GETRecipeDTO> recipeDTO = convertToGETRecipeDTOs(recipes);
+		if(recipeDTO.isEmpty()) {
+			throw new RuntimeException("No recipes with "+categoryName + " were found");
+		}
+		return recipeDTO;
+	}
+	
+	@Override
 	public List<GETRecipeDTOProfile> getRecipeByChefId(UUID chefId){
 		List<Recipe> recipes = recipeRepository.findAllByChefId(chefId);
 		List<GETRecipeDTOProfile> recipeDTO = new ArrayList<>();
@@ -133,7 +144,7 @@ public class RecipeServiceImplementation implements RecipeService{
 		categoryDTO_forRecipeGET categoryDTO = new categoryDTO_forRecipeGET
 			(
 				 recipe.getCategory().getCategory_id(),
-				 recipe.getCategory().getCategory_name()
+				 recipe.getCategory().getCategoryName()
 			);
 		
 		Set<IngredientDTO> ingredients = new HashSet<>();

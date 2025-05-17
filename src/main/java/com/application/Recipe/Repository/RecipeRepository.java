@@ -20,6 +20,7 @@ public interface RecipeRepository extends JpaRepository<Recipe, UUID>{
     List<Recipe> findRecentRecipes(@Param("cutoffTime") LocalDateTime cutoffTime);
 	List<Recipe> findAllByChefId(UUID chefId);
 	List<Recipe> findTop10ByOrderByTimeUploadedDesc();
+	List<Recipe> findByCategory_CategoryName(String categoryName);
 
 
 }
