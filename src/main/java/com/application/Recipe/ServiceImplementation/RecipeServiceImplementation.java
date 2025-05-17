@@ -140,11 +140,23 @@ public class RecipeServiceImplementation implements RecipeService{
 	}
 	
 	@Override
-	public List<Recipe> getLatestRecipes(LocalDateTime time) {
+	public List<Recipe> getLatestRecipes(LocalDateTime time, Integer page, Integer size) {
 		//LocalDateTime cutoffTime = time.minus(2, ChronoUnit.DAYS);
-		List<Recipe> recentRecipes = recipeRepository.findTop10ByOrderByTimeUploadedDesc();
-		Collections.sort(recentRecipes, Comparator.comparing(Recipe::getTimeUploaded));
-		return recentRecipes;
+		if(page !=null && size!=null) {
+			Pageable pageable = PageRequest.of(page, size);
+		Page<Recipe> recentRecipes = recipeRepository.findAllByOrderByTimeUploadedDesc(pageable);
+		//Collections.sort(recentRecipes, Comparator.comparing(Recipe::getTimeUploaded));
+		if(recentRecipes.hasContent()) {
+			return recentRecipes.getContent();
+		}else {
+			throw new RuntimeException("No recent recipes");
+		}
+		}else {
+			List<Recipe> rs = recipeRepository.findTop10ByOrderByTimeUploadedDesc();
+			if(rs.isEmpty())
+				throw new RuntimeException("No recent recipes");
+			return rs;
+		}
 	}
 	
 	@Override

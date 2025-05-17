@@ -99,13 +99,27 @@ public class recipeController {
 		}
 	}
 	
+	@GetMapping("/getAllRecipes")
+	public ResponseEntity<?> getAllRecipes(@RequestParam(required = false) Integer page,
+	        @RequestParam(required = false) Integer size)
+	{
+		try {
+			List<Recipe> recipes = recipeService.getAllRecipes(page,size);
+			List<GETRecipeDTO> recipeDTOs = recipeService.convertToGETRecipeDTOs(recipes);
+			return ResponseEntity.ok(recipeDTOs);
+		}catch(RuntimeException e){
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());	
+		}
+	}
+	
 	@GetMapping("/getRecentRecipes")
-	public ResponseEntity<?> getRecentRecipes(@RequestParam(required = false) LocalDateTime time)
+	public ResponseEntity<?> getRecentRecipes(@RequestParam(required = false) LocalDateTime time , @RequestParam(required = false) Integer page,
+	        @RequestParam(required = false) Integer size)
 	{
 		if (time == null) {
             time = LocalDateTime.now();
         }
-		List<Recipe> recipes = recipeService.getLatestRecipes(time);
+		List<Recipe> recipes = recipeService.getLatestRecipes(time, page, size);
 		if (recipes.isEmpty()) {
             return ResponseEntity.notFound().build();
         } else {
@@ -134,18 +148,6 @@ public class recipeController {
 		}
 	}
 
-	@GetMapping("/getAllRecipes")
-	public ResponseEntity<?> getAllRecipes(@RequestParam(required = false) Integer page,
-	        @RequestParam(required = false) Integer size)
-	{
-		try {
-			List<Recipe> recipes = recipeService.getAllRecipes(page,size);
-			List<GETRecipeDTO> recipeDTOs = recipeService.convertToGETRecipeDTOs(recipes);
-			return ResponseEntity.ok(recipeDTOs);
-		}catch(RuntimeException e){
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());	
-		}
-	}
 	
 	@PostMapping("/createRecipe")
 	public ResponseEntity<?> createRecipe(@Valid @RequestBody POSTRecipeDTO pOSTRecipeDTO)

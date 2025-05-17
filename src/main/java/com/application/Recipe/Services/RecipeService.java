@@ -26,7 +26,7 @@ public interface RecipeService {
 	
 	public List<Recipe> getAllRecipes(Integer page, Integer size);
 	
-	public List<Recipe> getLatestRecipes(LocalDateTime time);
+	public List<Recipe> getLatestRecipes(LocalDateTime time, Integer page, Integer size);
 	
 	public List<GETRecipeDTO> getRecipesByCategoryName(String categoryName);
 	
