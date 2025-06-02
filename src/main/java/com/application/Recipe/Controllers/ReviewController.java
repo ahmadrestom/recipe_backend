@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.application.Recipe.DTO.GetReviewDTO;
+import com.application.Recipe.Models.Review;
 import com.application.Recipe.Services.ReviewService;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -36,6 +37,34 @@ public class ReviewController {
 		}catch(EntityNotFoundException e) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
 		}catch(EmptyResultDataAccessException e) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+		}catch(Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+		}
+	}
+	
+	@DeleteMapping("/deleteReview/{recipeId}")
+	public ResponseEntity<?> deleteReview(@PathVariable UUID recipeId)
+	{
+		try {
+			reviewService.deleteReview(recipeId);
+			return ResponseEntity.ok("Review deleted successfully");
+		}catch(EntityNotFoundException e) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+		}catch(IllegalStateException e) {
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+		}catch(Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+		}
+	}
+	
+	@PostMapping("/addReview/{recipeId}")
+	public ResponseEntity<?> createReview(@PathVariable UUID recipeId, @RequestBody String reviewText)
+	{
+		try {
+			GetReviewDTO r = reviewService.addReview(recipeId, reviewText);
+			return ResponseEntity.ok(r);
+		}catch(EntityNotFoundException e) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
 		}catch(Exception e) {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
@@ -96,37 +125,4 @@ public class ReviewController {
 		}
 		
 	}*/
-	
-	
-	@DeleteMapping("/deleteReview/{recipeId}")
-	public ResponseEntity<?> deleteReview(@PathVariable UUID recipeId)
-	{
-		try {
-			reviewService.deleteReview(recipeId);
-			return ResponseEntity.ok("Review deleted successfully");
-		}catch(EntityNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-		}catch(IllegalStateException e) {
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
-		}catch(Exception e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-		}
-	}
-	
-	@PostMapping("/addReview/{recipeId}")
-	public ResponseEntity<?> createReview(@PathVariable UUID recipeId, @RequestBody String reviewText)
-	{
-		try {
-			reviewService.addReview(recipeId, reviewText);
-			return ResponseEntity.ok("Review created successfully");
-		}catch(EntityNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-		}catch(Exception e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-		}
-	}
-	
-	
-	
-
 }

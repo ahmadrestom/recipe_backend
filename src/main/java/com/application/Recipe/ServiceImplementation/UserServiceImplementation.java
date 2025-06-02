@@ -445,7 +445,7 @@ public class UserServiceImplementation implements UserService{
 					.difficultyLevel(recipe.getDifficultyLevel())
 					.rating(recipe.getRating())
 					.imageUrl(recipe.getImageUrl())
-					.categoryName(recipe.getCategory().getCategoryName())
+					.categoryName(recipe.getCategory().getCategory_name())
 					.chefName(recipe.getChef().getFirstName()+" "+recipe.getChef().getLastName())
 					.chefPictureUrl(recipe.getChef().getImage_url())
 					.build();

@@ -12,5 +12,4 @@ public class FollowerStatsDTO {
 	public FollowerStatsDTO(int followingNumber){
 		this.followingCount = followingNumber;
 	}
-
 }

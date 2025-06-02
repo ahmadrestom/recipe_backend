@@ -80,9 +80,7 @@ public class userController {
 		}else {
 			System.out.println(HttpStatus.INTERNAL_SERVER_ERROR);
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-		}
-					
-		
+		}	
 	}
 
 	@DeleteMapping("/deleteUser/{email}")

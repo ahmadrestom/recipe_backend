@@ -71,7 +71,4 @@ public class categoryController {
 		categoryService.removeCategory(categoryId);
 		return ResponseEntity.ok().build();
 	}
-	
-	
-
 }

@@ -83,7 +83,7 @@ public class RecipeServiceImplementation implements RecipeService{
 	
 	@Override
 	public List<GETRecipeDTO> getRecipesByCategoryName(String categoryName){
-		List<Recipe> recipes = recipeRepository.findByCategory_CategoryName(categoryName);
+		List<Recipe> recipes = recipeRepository.findByCategoryName(categoryName);
 		List<GETRecipeDTO> recipeDTO = convertToGETRecipeDTOs(recipes);
 		if(recipeDTO.isEmpty()) {
 			throw new RuntimeException("No recipes with "+categoryName + " were found");
@@ -170,7 +170,7 @@ public class RecipeServiceImplementation implements RecipeService{
 		categoryDTO_forRecipeGET categoryDTO = new categoryDTO_forRecipeGET
 			(
 				 recipe.getCategory().getCategory_id(),
-				 recipe.getCategory().getCategoryName()
+				 recipe.getCategory().getCategory_name()
 			);
 		
 		Set<IngredientDTO> ingredients = new HashSet<>();

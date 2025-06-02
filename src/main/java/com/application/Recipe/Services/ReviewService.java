@@ -16,7 +16,7 @@ public interface ReviewService {
 	public void deleteReview(UUID recipeId);
 	
 	@Transactional
-	public Review addReview(UUID recipeId, String review);
+	public GetReviewDTO addReview(UUID recipeId, String review);
 	
 	/*@Transactional
 	public void likeReview(UUID recipeId, UUID userId);

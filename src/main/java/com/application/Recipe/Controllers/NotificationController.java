@@ -50,6 +50,7 @@ public class NotificationController {
 	@PutMapping("/markAsRead/{notificationId}")
 	public ResponseEntity<?> markAsRead(@PathVariable UUID notificationId){
 		notificationService.markAsRead(notificationId);
+		System.out.println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXx");
 		return ResponseEntity.ok("Marked as read");
 	}
 	
@@ -58,18 +59,4 @@ public class NotificationController {
 		notificationService.deleteNotificationById(notificationId);
 		return ResponseEntity.ok("Delete successfully");
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-
 }

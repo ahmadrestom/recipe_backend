@@ -108,7 +108,7 @@ public class ReviewServiceImplementation implements ReviewService{
 
 	@Transactional
 	@Override
-	public Review addReview(UUID recipeId, String review){
+	public GetReviewDTO addReview(UUID recipeId, String review){
 		Recipe r = recipeRepository.findById(recipeId)
 				.orElseThrow(()-> new EntityNotFoundException("Recipe not available"));
 		
@@ -129,7 +129,20 @@ public class ReviewServiceImplementation implements ReviewService{
 	    		.user(user)
 	    		.build();
 	    
+	    ReviewUserData u = ReviewUserData.builder()
+                .firstName(createdReview.getUser().getFirstName())
+                .lastName(createdReview.getUser().getLastName())
+                .imageUrl(createdReview.getUser().getImage_url())
+                .userId(createdReview.getUser().getId())
+                .build();
+	    
 	    reviewRepository.save(createdReview);
+	    
+	    GetReviewDTO reviewDto = GetReviewDTO.builder()
+	    		.text(createdReview.getText())
+	    		.user(u)
+	    		.timeUploaded(createdReview.getTimeUploaded())
+	    		.build();
 	    
 	    Notification notification = new Notification();
 	    notification.setUser(r.getChef());
@@ -154,7 +167,7 @@ public class ReviewServiceImplementation implements ReviewService{
 			}
 		}
 	    
-	    return createdReview; 
+	    return reviewDto; 
 	}
 
 	/*@Transactional

@@ -23,7 +23,8 @@ public interface RecipeRepository extends JpaRepository<Recipe, UUID>{
 	List<Recipe> findAllByChefId(UUID chefId);
 	Page<Recipe> findAllByOrderByTimeUploadedDesc(Pageable pageable);
 	List<Recipe> findTop10ByOrderByTimeUploadedDesc();
-	List<Recipe> findByCategory_CategoryName(String categoryName);
+	@Query("SELECT r FROM Recipe r WHERE r.category.category_name = :categoryName")
+	List<Recipe> findByCategoryName(@Param("categoryName") String categoryName);
 	Page<Recipe> findAll(Pageable pageable);
 
 

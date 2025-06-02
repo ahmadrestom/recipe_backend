@@ -39,7 +39,7 @@ public class category implements Serializable{
 	private UUID category_id;
 	
 	@Column(name="category_name", nullable = false)
-	private String categoryName;
+	private String category_name;
 	
 	@OneToMany(mappedBy = "category", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@JsonBackReference
